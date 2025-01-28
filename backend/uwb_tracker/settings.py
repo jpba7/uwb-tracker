@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -94,14 +99,17 @@ WSGI_APPLICATION = 'uwb_tracker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+USE_REMOTE_DB = True
+IS_REMOTE = 'REMOTE_' if (os.getenv('ENVIRONMENT') == 'production' or USE_REMOTE_DB) else ''
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', ''),
-        'NAME': os.getenv('DB_NAME', ''),
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+        'NAME': os.getenv(IS_REMOTE + 'DB_NAME', ''),
+        'USER': os.getenv(IS_REMOTE + 'DB_USER', ''),
+        'PASSWORD': os.getenv(IS_REMOTE + 'DB_PASSWORD', ''),
+        'HOST': os.getenv(IS_REMOTE + 'DB_HOST', ''),
+        'PORT': os.getenv(IS_REMOTE + 'DB_PORT', ''),
     }
 }
 
