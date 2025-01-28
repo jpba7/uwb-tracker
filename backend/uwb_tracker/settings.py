@@ -20,7 +20,10 @@ load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+if os.getenv('ENVIRONMENT') == 'dev':
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent
+else:
+    BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -152,8 +155,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
-STATIC_ROOT = BASE_DIR / 'backend' / 'staticfiles'
+
+if os.getenv('ENVIRONMENT') == 'dev':
+    STATIC_ROOT = BASE_DIR / 'backend' / 'staticfiles'
+    STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
+if os.getenv('ENVIRONMENT') == 'production':
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
