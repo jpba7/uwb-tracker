@@ -35,6 +35,8 @@ DEBUG = os.getenv('ENVIRONMENT') == 'dev'
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [os.getenv('URL')]
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
