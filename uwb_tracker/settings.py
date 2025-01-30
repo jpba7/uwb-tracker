@@ -153,11 +153,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-if os.getenv('ENVIRONMENT') == 'dev':
-    STATIC_ROOT = BASE_DIR / 'backend' / 'staticfiles'
-    STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
-if os.getenv('ENVIRONMENT') == 'production':
-    STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
 
 
 # Default primary key field type

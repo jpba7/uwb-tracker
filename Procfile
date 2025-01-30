@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn a_core.wsgi 
+web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn uwb_tracker.wsgi
