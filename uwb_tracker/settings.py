@@ -20,10 +20,7 @@ load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-if os.getenv('ENVIRONMENT') == 'dev':
-    BASE_DIR = Path(__file__).resolve().parent.parent.parent
-else:
-    BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
