@@ -174,4 +174,7 @@ cython_debug/
 .vscode/*
 
 # Static Files
-.staticfiles/*
+.static/*
+
+# Node Modules
+/node_modules
