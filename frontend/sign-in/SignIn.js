@@ -13,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { SitemarkIcon, SitemarkIconWithText } from './components/CustomIcons';
+import { SitemarkIcon, SitemarkIconWithText } from '../shared-theme/CustomIcons';
 import { getCookie } from '../utils'
 
 const csrftoken = getCookie('csrftoken')

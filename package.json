@@ -32,6 +32,12 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.4.2",
+    "@mui/x-charts": "^7.25.0",
+    "@mui/x-data-grid": "^7.25.0",
+    "@mui/x-date-pickers": "^7.25.0",
+    "@mui/x-tree-view": "^7.25.0",
+    "@react-spring/web": "^9.7.5",
+    "dayjs": "^1.11.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }
