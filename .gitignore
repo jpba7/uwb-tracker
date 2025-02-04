@@ -175,6 +175,7 @@ cython_debug/
 
 # Static Files
 /static
+/frontend/static-local/
 
 # Node Modules
 /node_modules
