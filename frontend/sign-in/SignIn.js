@@ -1,9 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -15,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { SitemarkIcon } from './components/CustomIcons';
+import { SitemarkIcon, SitemarkIconWithText } from './components/CustomIcons';
 import { getCookie } from '../utils'
 
 const csrftoken = getCookie('csrftoken')
@@ -57,7 +55,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
     backgroundRepeat: 'no-repeat',
     ...theme.applyStyles('dark', {
       backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+        'radial-gradient(at 50% 50%, hsla(210, 66.20%, 30.20%, 0.50), hsl(220, 30%, 5%))',
     }),
   },
 }));
@@ -110,7 +108,7 @@ export default function SignIn(props) {
       <SignInContainer direction="column" justifyContent="space-between">
         <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
         <Card variant="outlined">
-          <SitemarkIcon />
+          <SitemarkIconWithText />
           <Typography
             component="h1"
             variant="h4"
@@ -140,6 +138,7 @@ export default function SignIn(props) {
                 id="username"
                 type="username"
                 name="username"
+                placeholder="Usuário ou email"
                 autoComplete="username"
                 autoFocus
                 required

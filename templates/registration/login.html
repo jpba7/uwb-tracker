@@ -1,19 +1,25 @@
-<form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-        <tr>
-            <td>Login</td>
-            <td>{{ form.username }}</td>
-        </tr>
-        <tr>
-            <td>Senha</td>
-            <td>{{ form.password }}</td>
-        </tr>
-    </table>
-    <input type="submit" value="login">
-    <input type="hidden" name="next" value="{{ next }}">
-</form>
-{# Assumes you set up the password_reset view in your URLconf #}
-<p>
-    <a href="{% url 'password_reset' %}">Esqueci a senha.</a>
-</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script>
+        window.DJANGO_URLS = {
+            PASSWORD_RESET: "{% url 'password_reset' %}"
+        };
+    </script>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script src="{% static 'index-bundle.js' %}"></script>
+
+    <script>
+        renderSignIn()
+    </script>
+
+</body>
+</html>

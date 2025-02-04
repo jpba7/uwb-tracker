@@ -27,7 +27,7 @@ function ForgotPassword({ open, handleClose }) {
         },
       }}
     >
-      <DialogTitle>Reset password</DialogTitle>
+      <DialogTitle>Resetar senha</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >

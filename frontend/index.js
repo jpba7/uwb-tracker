@@ -1,7 +1,11 @@
 import React from 'react';
-import ReactDOM from "react-dom/client";
+import { createRoot } from 'react-dom/client';
+import SignIn from './sign-in/SignIn';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <h1>Hello, react!</h1>
-);
+// Garantir que ReactDOM não seja minificado incorretamente
+window.React = React;
+
+// Expor a função globalmente
+window.renderSignIn = function () {
+  createRoot(document.getElementById('root')).render(<SignIn />);
+};
