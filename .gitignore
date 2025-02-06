@@ -174,8 +174,10 @@ cython_debug/
 .vscode/*
 
 # Static Files
-/static
-/frontend/static-local/
+/static/*
+!/static/favicon.ico
+/frontend/static-local/*
+!/frontend/static-local/favicon.ico
 
 # Node Modules
 /node_modules
