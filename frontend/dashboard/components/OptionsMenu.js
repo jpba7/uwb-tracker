@@ -60,8 +60,10 @@ export default function OptionsMenu() {
         <MenuItem onClick={handleClose}>Settings</MenuItem>
         <Divider />
         <MenuItem
-          onClick={handleClose}
-          sx={{
+            onClick={() => {
+              window.location.href = "/accounts/logout/";
+            }}
+            sx={{
             [`& .${listItemIconClasses.root}`]: {
               ml: 'auto',
               minWidth: 0,
