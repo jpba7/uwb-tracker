@@ -16,13 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth import views
-from django.urls import path, include, re_path
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import include, path, re_path
+from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
+
+class IndexView(LoginRequiredMixin, TemplateView):
+    template_name = 'index.html'
+
+
 urlpatterns = [
     path('', views.LoginView.as_view(), name='login'),
+    path('index', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('django/accounts/', include('django.contrib.auth.urls')),
     re_path(r'^favicon\.ico$', favicon_view),
