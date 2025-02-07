@@ -14,6 +14,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+
 from django.contrib import admin
 from django.contrib.auth import views
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,10 +28,11 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
+    login_url = '/'
 
 
 urlpatterns = [
-    path('', views.LoginView.as_view(), name='login'),
+    path('', views.LoginView.as_view(), name='my_login'),
     path('index', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('django/accounts/', include('django.contrib.auth.urls')),
