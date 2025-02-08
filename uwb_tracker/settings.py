@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'uwb_tracker',
     'corsheaders',
+    'devices.apps.DevicesConfig'
 ]
 
 MIDDLEWARE = [
@@ -101,8 +102,8 @@ WSGI_APPLICATION = 'uwb_tracker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-USE_REMOTE_DB = True
-IS_REMOTE = 'REMOTE_' if (os.getenv('ENVIRONMENT') == 'dev' and USE_REMOTE_DB) else ''
+USE_REMOTE_DB = False
+IS_REMOTE = 'REMOTE_' if (os.getenv('ENVIRONMENT') == 'production' or USE_REMOTE_DB) else ''
 
 DATABASES = {
     'default': {
