@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "wp_dev": "webpack --mode development --watch",
-    "wp_prod": "node --max-old-space-size=4096 ./node_modules/.bin/webpack --mode production"
+    "wp_prod": "node --max-old-space-size=448 ./node_modules/.bin/webpack --mode production"
   },
   "repository": {
     "type": "git",
