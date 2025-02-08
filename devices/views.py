@@ -31,4 +31,4 @@ class DeviceDataPointList(ListAPIView):
             datapoints = DeviceDataPoints.objects.filter(
                 timestamp__gte=datetime(2023, 1, 1), timestamp__lte=datetime(2023, 1, 2))  # TODO MUDAR PARA HOJE
 
-        return datapoints
+        return datapoints.order_by('timestamp')
