@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'uwb_tracker',
     'corsheaders',
-    'devices.apps.DevicesConfig'
+    'devices.apps.DevicesConfig',
+    'employees.apps.EmployeesConfig',
 ]
 
 MIDDLEWARE = [
