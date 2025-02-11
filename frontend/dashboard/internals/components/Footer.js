@@ -2,7 +2,7 @@ import * as React from 'react';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 
-export default function Copyright(props) {
+export default function Footer(props) {
   return (
     <Typography
       variant="body2"
@@ -15,12 +15,13 @@ export default function Copyright(props) {
         ...(Array.isArray(props.sx) ? props.sx : [props.sx]),
       ]}
     >
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Sitemark
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
+      {'Desenvolvido por João Pedro Bimbato ('}
+      <Link color="inherit" href="https://www.github.com/jpba7">
+        GitHub
+      </Link>{' | '}
+      <Link color="inherit" href="https://www.linkedin.com/in/jpbimbato/">
+        LinkedIn
+      </Link>{').'}
     </Typography>
   );
 }
