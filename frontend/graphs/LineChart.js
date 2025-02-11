@@ -17,8 +17,11 @@ const LineChart = ({x_data, y_data}) => {
             axisPointer: {
                 type: "cross"
             },
-            backgroundColor: "rgba(0, 0, 0, 0.59)",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
             borderWidth: 0,
+            textStyle: {
+                color: '#fff',
+            },
         },
         grid: {
             left: "3%",
