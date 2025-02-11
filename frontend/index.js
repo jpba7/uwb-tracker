@@ -1,11 +1,18 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Dashboard from './dashboard/Dashboard'
+import App from './App';
+import { BrowserRouter } from 'react-router-dom';
 
-// Garantir que ReactDOM não seja minificado incorretamente
+// Garantir que React não seja minificado incorretamente
 window.React = React;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById("root");
-  createRoot(container).render(<Dashboard />);
-});
+const container = document.getElementById('root');
+const root = createRoot(container);
+
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
