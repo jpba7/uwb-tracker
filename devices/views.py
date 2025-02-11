@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 
 from devices.models import DeviceDataPoints
-from devices.serializer import DeviceDatapointSerializer
+from devices.serializers import DeviceDatapointSerializer
 
 
 class DeviceDataPointList(ListAPIView):

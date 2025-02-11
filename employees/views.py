@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny
 
-# Create your views here.
+from .serializers import EmployeeSerializer
+from .models import Employee
+
+
+class EmployeesList(ListAPIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+    serializer_class = EmployeeSerializer
+    queryset = Employee.objects.all()
