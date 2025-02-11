@@ -12,4 +12,4 @@ class DeviceSerializer(serializers.ModelSerializer):
 class DeviceDatapointSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeviceDataPoints
-        fields = ['measure', 'timestamp']
+        fields = ['x', 'y', 'z', 'timestamp']

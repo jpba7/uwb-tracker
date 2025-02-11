@@ -18,7 +18,9 @@ class DeviceType(models.Model):
 
 class DeviceDataPoints(models.Model):
     device = models.ForeignKey('Device', on_delete=models.CASCADE)
-    measure = models.DecimalField(max_digits=10, decimal_places=2)
+    x = models.DecimalField(max_digits=10, decimal_places=2)
+    y = models.DecimalField(max_digits=10, decimal_places=2)
+    z = models.DecimalField(max_digits=10, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:

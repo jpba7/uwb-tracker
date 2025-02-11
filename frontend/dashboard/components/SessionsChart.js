@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
@@ -40,7 +39,6 @@ function getDaysInMonth(month, year) {
 }
 
 export default function SessionsChart() {
-  const theme = useTheme();
   const [chartData, setChartData] = React.useState({
     x_data: [],
     y_data: []
@@ -55,8 +53,7 @@ export default function SessionsChart() {
         
         // Transformar os dados da API
         const x_data = data.map(point => new Date(point.timestamp).toLocaleDateString());
-        const y_data = data.map(point => point.measure);
-        
+        const y_data = data.map(point => point.x);
         setChartData({ x_data, y_data });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
