@@ -1,7 +1,67 @@
 import * as React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import {DataGrid, GridToolbarContainer,  GridToolbarQuickFilter, GridToolbarExport} from '@mui/x-data-grid';
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
 
-export default function CustomizedDataGrid({columns, rows}) {
+const StyledGridOverlay = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  padding: theme.spacing(1),
+}));
+
+function CustomNoRowsOverlay() {
+  return (
+    <StyledGridOverlay>
+      <Box sx={{ mt: 1 }}>Nenhum registro encontrado</Box>
+    </StyledGridOverlay>
+  );
+}
+
+function CustomNoResultsOverlay() {
+  return (
+    <StyledGridOverlay>
+      <Box sx={{ mt: 1 }}>Nenhum resultado encontrado para sua pesquisa</Box>
+    </StyledGridOverlay>
+  );
+}
+
+function CustomToolbar() {
+  return (
+    <Box 
+      sx={{ 
+        p: 1, 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
+    >
+      <GridToolbarContainer>
+        <GridToolbarQuickFilter
+          placeholder="Pesquisar..."
+        />
+      </GridToolbarContainer>
+
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <GridToolbarExport />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => {/* TODO Adicione sua lógica aqui */}}
+        >
+          Adicionar
+        </Button>
+      </Box>
+    </Box>
+  );
+}
+
+export default function CustomizedDataGrid({columns, rows, hideToolbar = false}) {
   return (
     <DataGrid
       rows={rows}
@@ -11,35 +71,23 @@ export default function CustomizedDataGrid({columns, rows}) {
       }
       initialState={{
         pagination: { paginationModel: { pageSize: 20 } },
+
       }}
-      pageSizeOptions={[10, 20, 50]}
+      pageSizeOptions={[10, 20, 50, 100, { value: -1, label: 'All' }]}
       disableColumnResize
       disableRowSelectionOnClick
+      disableColumnFilter
+      disableColumnSelector
+      disableDensitySelector
       density="standard"
+      slots={{
+        noRowsOverlay: CustomNoRowsOverlay,
+        noResultsOverlay: CustomNoResultsOverlay,
+        toolbar: hideToolbar ? null : CustomToolbar
+      }}
       slotProps={{
-        filterPanel: {
-          filterFormProps: {
-            logicOperatorInputProps: {
-              variant: 'outlined',
-              size: 'small',
-            },
-            columnInputProps: {
-              variant: 'outlined',
-              size: 'small',
-              sx: { mt: 'auto' },
-            },
-            operatorInputProps: {
-              variant: 'outlined',
-              size: 'small',
-              sx: { mt: 'auto' },
-            },
-            valueInputProps: {
-              InputComponentProps: {
-                variant: 'outlined',
-                size: 'small',
-              },
-            },
-          },
+        toolbar: {
+          showQuickFilter: !hideToolbar,
         },
       }}
     />

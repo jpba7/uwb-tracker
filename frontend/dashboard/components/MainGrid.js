@@ -11,7 +11,8 @@ import HighlightedCard from './HighlightedCard';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard from './StatCard';
-import { columns, rows } from './employees/EmployeeList'
+import EmployeeTable from './employees/EmployeeTable';
+
 
 const data = [
   {
@@ -80,7 +81,7 @@ export default function MainGrid() {
       </Typography>
       <Grid container spacing={2} columns={12}>
         <Grid size={{ xs: 12, lg: 9 }}>
-          <CustomizedDataGrid columns={columns} rows={rows} />
+          <EmployeeTable />
         </Grid>
         <Grid size={{ xs: 12, lg: 3 }}>
           <Stack gap={2} direction={{ xs: 'column', sm: 'row', lg: 'column' }}>
