@@ -40,4 +40,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('api/', include('api.urls')),
     path('devices/', include('devices.urls')),
+    path('employees/', include('employees.urls')),
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
