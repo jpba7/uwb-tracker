@@ -3,17 +3,19 @@ import { Routes, Route } from 'react-router-dom';
 import Dashboard from './dashboard/Dashboard';
 import MainGrid from './dashboard/components/MainGrid';
 import EmployeeGrid from './dashboard/components/employees/EmployeeGrid';
-import TestGrid from './dashboard/components/tests/TestGrid'
+import HeatmapGrid from './dashboard/components/heatmap/HeatmapGrid';
+import EmployeeHeatmapGrid from './dashboard/components/employees/EmployeeHeatmapGrid';
+//import NotFound from './NotFound';
 
-// import NotFound from './NotFound';
-{/* <Route path="*" element={<NotFound />} /> */}
 
 function App() {
   return (
     <Routes>
       <Route path="/index" element={<Dashboard><MainGrid /></Dashboard>} />
       <Route path="/employees" element={<Dashboard><EmployeeGrid /></Dashboard>} />
-      <Route path="/tests" element={<Dashboard><TestGrid /></Dashboard>} />
+      <Route path="/employees/:cpf/heatmap" element={<Dashboard><EmployeeHeatmapGrid /></Dashboard>} />
+      <Route path="/heatmap" element={<Dashboard><HeatmapGrid /></Dashboard>} />
+      <Route path="*" element={<h1>Página não encontrada</h1>} />
     </Routes>
   );
 }
