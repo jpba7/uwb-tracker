@@ -1,8 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-import numpy as np
-from django.db.models import Count, F, DecimalField
+from django.db.models import Count, DecimalField, F
 from django.db.models.functions import Floor
 from django.utils.dateparse import parse_date
 from rest_framework.generics import ListAPIView
@@ -10,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from devices.models import DeviceDataPoints
+from devices.models import Device, DeviceDataPoints
 from devices.serializers import DeviceDatapointSerializer
 
 
@@ -44,15 +43,33 @@ class DeviceDataPointHeatMap(APIView):
     permission_classes = [AllowAny]  # TODO REMOVER
 
     def get(self, request):
-        device_id = self.request.GET.get('device_id', None)
-        cell_size = Decimal(0.1)
+        cpf = self.request.GET.get('cpf', None)
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
 
-        # Agregar dados no nível do banco de dados
-        query = DeviceDataPoints.objects.all()
-        if device_id:
-            query = query.filter(device_id=device_id)
+        start_date = parse_date(start_date) if start_date else None
+        end_date = parse_date(end_date) if end_date else None
 
+        filters = {}
+
+        if start_date:
+            filters['timestamp__gte'] = start_date
+        if end_date:
+            filters['timestamp__lte'] = end_date
+
+        if cpf:
+            device = Device.objects.get(linked_employee__cpf=cpf, device_type__name='Tag')
+            filters['device'] = device
+
+        query = DeviceDataPoints.objects.filter(**filters)
+
+        formatted_data = self.to_heatmap(query)
+        return Response({'xyd': formatted_data})
+
+    def to_heatmap(self, instance):
+        query = instance
         # Calcular grid no banco de dados
+        cell_size = Decimal(0.1)
         heatmap_data = query.annotate(
             grid_x=Floor(F('x') / cell_size, output_field=DecimalField(max_digits=10, decimal_places=2)),
             grid_y=Floor(F('y') / cell_size, output_field=DecimalField(max_digits=10, decimal_places=2))
@@ -71,4 +88,4 @@ class DeviceDataPointHeatMap(APIView):
             for x, y, count in heatmap_data
         ]
 
-        return Response({'xyd': formatted_data})
+        return formatted_data
