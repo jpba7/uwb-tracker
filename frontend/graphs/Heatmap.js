@@ -31,22 +31,16 @@ const Heatmap = React.memo(({ employee_cpf = null, start_date = null, end_date =
     return data;
   };
 
-  // useEffect(() => {
-  //   console.log("Dados do heatmap:");
-  //   console.log("Número total de pontos:", XYD.length);
-  //   console.log("Valores mínimos e máximos:");
-  //   const xValues = XYD.map(p => p[0]);
-  //   const yValues = XYD.map(p => p[1]);
-  //   const probValues = XYD.map(p => p[2]);
-  //   console.log("X -> min:", Math.min(...xValues), "max:", Math.max(...xValues));
-  //   console.log("Y -> min:", Math.min(...yValues), "max:", Math.max(...yValues));
-  //   console.log("Prob -> min:", Math.min(...probValues), "max:", Math.max(...probValues));
-  // }, [XYD]);
-
   const xAxisData = generateAxisData(0, 21, 1);
   const yAxisData = generateAxisData(0, 20, 1);
 
   const option = {
+    grid: {
+      left: '10%',
+      right: '10%',
+      bottom: '30%',
+      top: '5%'
+    },
     tooltip: {
       position: 'top',
       formatter: function (params) {
@@ -70,8 +64,11 @@ const Heatmap = React.memo(({ employee_cpf = null, start_date = null, end_date =
     visualMap: {
       min: 0,
       max: 0.15,
+      formatter: (value) => value.toFixed(3),
       calculable: true,
       realtime: false,
+      left: 'center',
+      orient: 'horizontal',
       inRange: {
         color: [
           '#313695',
