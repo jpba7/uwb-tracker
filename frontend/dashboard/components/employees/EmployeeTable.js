@@ -1,11 +1,20 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import CustomizedDataGrid from '../CustomizedDataGrid';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 
-const columns = [
+
+const createColumns = (handleHeatmapClick) => [
+  { 
+    field: 'id',
+    headerName: 'ID',
+    flex: 0.3,
+    minWidth: 60
+  },
   { 
     field: 'name',
     headerName: 'Nome',
@@ -47,7 +56,7 @@ const columns = [
     minWidth: 90,
     renderCell: (params) => (
       <div>
-        <IconButton size="small" onClick={() => handleEdit(params.row)}>
+        <IconButton size="small" onClick={() => handleHeatmapClick(params.row)}>
           <MapOutlinedIcon />
         </IconButton>
       </div>
@@ -71,7 +80,15 @@ const columns = [
 ];
 
 export default function EmployeeTable({hideToolbar = false}){
+  const navigate = useNavigate();
   const [rows, setRows] = useState([]);
+
+  const handleHeatmapClick = (employee) => {
+    navigate(`/employees/${employee.cpf}/heatmap`);
+  };
+
+  const columns = React.useMemo(() => createColumns(handleHeatmapClick), []);
+
 
   useEffect(() => {
     fetch('/employees/api/list')
