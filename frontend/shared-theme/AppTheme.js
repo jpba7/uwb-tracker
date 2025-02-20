@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-
+import { ptBR } from '@mui/material/locale';
 import { inputsCustomizations } from './customizations/inputs';
 import { dataDisplayCustomizations } from './customizations/dataDisplay';
 import { feedbackCustomizations } from './customizations/feedback';
@@ -32,7 +32,7 @@ function AppTheme(props) {
             ...surfacesCustomizations,
             ...themeComponents,
           },
-        });
+        }, ptBR);
   }, [disableCustomTheme, themeComponents]);
   if (disableCustomTheme) {
     return <React.Fragment>{children}</React.Fragment>;
