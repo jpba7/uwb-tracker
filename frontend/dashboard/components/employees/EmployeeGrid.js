@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import Grid from '@mui/material/Grid2';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import Footer from '../../internals/components/Footer';
-import CustomizedDataGrid from '../CustomizedDataGrid';
+import React, { useEffect, useState } from 'react';
 import { employeeService } from '../../../services/employeeService';
+import Footer from '../../internals/components/Footer';
 import EmployeeForm from './EmployeeForm';
 import EmployeeTable from './EmployeeTable';
 
@@ -59,9 +56,11 @@ export default function EmployeeGrid() {
       
       <Grid container spacing={2} columns={12}>
         <Grid size={{ xs: 12, lg: 12 }}>
-          <EmployeeTable 
-            onAdd={handleAdd}
-            addButtonLabel="Novo"
+          <EmployeeTable
+            rows={rows}
+            handleAdd={handleAdd}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
           />
         </Grid>
       </Grid>

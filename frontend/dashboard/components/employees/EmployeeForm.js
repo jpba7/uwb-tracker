@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { employeeService } from '../../../services/employeeService';
 
 // Styled components
@@ -45,6 +45,9 @@ const textFieldSX = {
   }
 };
 
+// Adicione esta função helper no início do arquivo, após os imports
+const cleanNumericString = (str) => str.replace(/\D/g, '');
+
 export default function EmployeeForm({ open, handleClose, employee, onSubmit }) {
   const [formData, setFormData] = useState({
     first_name: '',
@@ -54,33 +57,152 @@ export default function EmployeeForm({ open, handleClose, employee, onSubmit }) 
     phone: '',
     emergency_contact: '',
     address: '',
-    ...employee,
   });
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    if (employee) {
+      setFormData({
+        first_name: employee.first_name || '',
+        last_name: employee.last_name || '',
+        cpf: employee.cpf || '',
+        email: employee.email || '',
+        phone: employee.phone || '',
+        emergency_contact: employee.emergency_contact || '',
+        address: employee.address || '',
+      });
+    } else {
+      // Limpa o formulário quando não há employee
+      setFormData({
+        first_name: '',
+        last_name: '',
+        cpf: '',
+        email: '',
+        phone: '',
+        emergency_contact: '',
+        address: '',
+      });
+    }
+  }, [employee]);
+
+  const validateCPF = (cpf) => {
+    // Remove caracteres não numéricos
+    const cleanCPF = cpf.replace(/[^\d]/g, '');
+    
+    if (cleanCPF.length !== 11) {
+      return false;
+    }
+    
+    // Verifica se todos os dígitos são iguais
+    if (/^(\d)\1+$/.test(cleanCPF)) {
+      return false;
+    }
+  
+    return true;
+  };
+  
+  const validatePhone = (phone) => {
+    // Remove caracteres não numéricos
+    const cleanPhone = phone.replace(/[^\d]/g, '');
+    // Verifica se tem entre 10 e 11 dígitos (com ou sem DDD)
+    return cleanPhone.length >= 10 && cleanPhone.length <= 11;
+  };
+
   const handleChange = (event) => {
+    const { name, value } = event.target;
+    let formattedValue = value;
+  
+    // Formatação específica para cada campo
+    if (name === 'cpf') {
+      // Formata CPF: 000.000.000-00
+      formattedValue = value
+        .replace(/\D/g, '') // Remove não-dígitos
+        .slice(0, 11) // Limita a 11 dígitos
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})/, '$1-$2');
+    } else if (name === 'phone' || name === 'emergency_contact') {
+      // Formata telefone: (00) 00000-0000 ou (00) 0000-0000
+      const numbers = value.replace(/\D/g, '');
+      
+      if (numbers.length <= 10) {
+        // Formato para números com 8 dígitos: (00) 0000-0000
+        formattedValue = numbers
+          .replace(/(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{4})(\d)/, '$1-$2')
+          .slice(0, 14);
+      } else {
+        // Formato para números com 9 dígitos: (00) 00000-0000
+        formattedValue = numbers
+          .replace(/(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{5})(\d)/, '$1-$2')
+          .slice(0, 15);
+      }
+    }
+  
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value,
+      [name]: formattedValue,
     });
-    // Clear error when user starts typing
+    
     setErrors({
       ...errors,
-      [event.target.name]: null,
+      [name]: null,
     });
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.first_name) newErrors.first_name = 'Primeiro nome é obrigatório';
-    if (!formData.last_name) newErrors.last_name = 'Último nome é obrigatório';
-    if (!formData.cpf) newErrors.cpf = 'CPF é obrigatório';
-    if (!formData.email) newErrors.email = 'Email é obrigatório';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email inválido';
-    if (!formData.phone) newErrors.phone = 'Telefone é obrigatório';
-    if (!formData.emergency_contact) newErrors.emergency_contact = 'Contato de emergência é obrigatório';
-    if (!formData.address) newErrors.address = 'Endereço é obrigatório';
     
+    // Validação do primeiro nome
+    if (!formData.first_name) {
+      newErrors.first_name = 'Primeiro nome é obrigatório';
+    } else if (formData.first_name.length > 100) {
+      newErrors.first_name = 'O primeiro nome deve ter no máximo 100 caracteres';
+    }
+  
+    // Validação do último nome
+    if (!formData.last_name) {
+      newErrors.last_name = 'Último nome é obrigatório';
+    } else if (formData.last_name.length > 100) {
+      newErrors.last_name = 'O último nome deve ter no máximo 100 caracteres';
+    }
+  
+    // Validação do CPF
+    if (!formData.cpf) {
+      newErrors.cpf = 'CPF é obrigatório';
+    } else if (!validateCPF(formData.cpf)) {
+      newErrors.cpf = 'CPF inválido';
+    }
+  
+    // Validação do email
+    if (!formData.email) {
+      newErrors.email = 'Email é obrigatório';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
+      newErrors.email = 'Email inválido';
+    }
+  
+    // Validação do telefone
+    if (!formData.phone) {
+      newErrors.phone = 'Telefone é obrigatório';
+    } else if (!validatePhone(formData.phone)) {
+      newErrors.phone = 'Telefone inválido';
+    }
+  
+    // Validação do contato de emergência
+    if (!formData.emergency_contact) {
+      newErrors.emergency_contact = 'Contato de emergência é obrigatório';
+    } else if (!validatePhone(formData.emergency_contact)) {
+      newErrors.emergency_contact = 'Telefone de emergência inválido';
+    }
+  
+    // Validação do endereço
+    if (!formData.address) {
+      newErrors.address = 'Endereço é obrigatório';
+    } else if (formData.address.length > 200) {
+      newErrors.address = 'O endereço deve ter no máximo 200 caracteres';
+    }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -89,11 +211,19 @@ export default function EmployeeForm({ open, handleClose, employee, onSubmit }) 
     event.preventDefault();
     if (!validateForm()) return;
 
+    // Cria uma cópia dos dados com apenas números para CPF e telefones
+    const cleanedFormData = {
+      ...formData,
+      cpf: cleanNumericString(formData.cpf),
+      phone: cleanNumericString(formData.phone),
+      emergency_contact: cleanNumericString(formData.emergency_contact)
+    };
+
     try {
       if (employee?.id) {
-        await employeeService.update(employee.id, formData);
+        await employeeService.update(employee.id, cleanedFormData);
       } else {
-        await employeeService.create(formData);
+        await employeeService.create(cleanedFormData);
       }
       onSubmit();
       handleClose();
