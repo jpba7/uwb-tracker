@@ -30,7 +30,7 @@ function CustomNoResultsOverlay() {
   );
 }
 
-function CustomToolbar({ onAdd, addButtonLabel }) {
+function CustomToolbar({ handleAdd, addButtonLabel }) {
   return (
     <Box 
       sx={{ 
@@ -48,14 +48,14 @@ function CustomToolbar({ onAdd, addButtonLabel }) {
 
       <Box sx={{ display: 'flex', gap: 1 }}>
         <GridToolbarExport />
-        {onAdd && (
+        {handleAdd && (
           <Button
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={onAdd}
+            onClick={handleAdd}
           >
-            {addButtonLabel || 'Adicionar'}
+            {addButtonLabel || 'Novo'}
           </Button>
         )}
       </Box>
@@ -67,8 +67,8 @@ export default function CustomizedDataGrid({
   columns, 
   rows, 
   hideToolbar = false,
-  onAdd,
-  addButtonLabel
+  handleAdd,
+  addButtonLabel = "Novo",
 }) {
   return (
     <DataGrid
@@ -96,7 +96,7 @@ export default function CustomizedDataGrid({
       slotProps={{
         toolbar: {
           showQuickFilter: !hideToolbar,
-          onAdd,
+          handleAdd,
           addButtonLabel
         },
       }}
