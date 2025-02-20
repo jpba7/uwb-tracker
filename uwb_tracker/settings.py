@@ -35,7 +35,7 @@ DEBUG = os.getenv('ENVIRONMENT') == 'dev'
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = [os.getenv('URL')]
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "wp_dev": "webpack --mode development --watch",
-    "wp_prod": "node --max-old-space-size=448 ./node_modules/.bin/webpack --mode production"
+    "wp_dev": "webpack --mode development --watch --progress",
+    "wp_prod": "webpack --mode production --progress",
+    "build": "webpack --mode production",
+    "clean": "rimraf frontend/static-local/*"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "echarts-for-react": "^3.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-input-mask": "^2.0.4",
     "react-router-dom": "^7.1.5"
   }
 }

@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import CustomizedDataGrid from '../CustomizedDataGrid';
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
+import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import IconButton from '@mui/material/IconButton';
+import CustomizedDataGrid from '../CustomizedDataGrid';
 
 
 const createColumns = (handleHeatmapClick) => [
@@ -65,21 +65,28 @@ const createColumns = (handleHeatmapClick) => [
   {
     field: 'actions',
     headerName: 'Ações',
-    headerAlign: 'center',
-    align: 'center',
-    flex: 1,
-    minWidth: 90,
+    width: 120,
     renderCell: (params) => (
-      <div>
-        <IconButton size="small" onClick={() => handleEdit(params.row)}>
-          <EditIcon />
+      <>
+        <IconButton
+          size="small"
+          onClick={() => handleEdit(params.row)}
+        >
+          <EditOutlined />
         </IconButton>
-      </div>
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => handleDelete(params.row.id)}
+        >
+          <DeleteOutlineOutlined />
+        </IconButton>
+      </>
     ),
   },
 ];
 
-export default function EmployeeTable({hideToolbar = false}){
+export default function EmployeeTable({hideToolbar = false, onAdd, addButtonLabel}){
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
 
@@ -97,5 +104,11 @@ export default function EmployeeTable({hideToolbar = false}){
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  return <CustomizedDataGrid columns={columns} rows={rows} hideToolbar={hideToolbar} />
+  return <CustomizedDataGrid
+            columns={columns}
+            rows={rows}
+            hideToolbar={hideToolbar}
+            onAdd={onAdd}
+            addButtonLabel={addButtonLabel}
+          />
 }

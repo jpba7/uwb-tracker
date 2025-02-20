@@ -14,9 +14,9 @@ import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import { SitemarkIcon, SitemarkIconWithText } from '../shared-theme/CustomIcons';
-import { getCookie } from '../utils'
+import { getCSRFToken } from '../utils'
 
-const csrftoken = getCookie('csrftoken')
+const csrftoken = getCSRFToken('csrftoken')
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',

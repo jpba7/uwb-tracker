@@ -7,9 +7,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { getCookie } from '../../utils';
+import { getCSRFToken } from '../../utils';
 
-const csrftoken = getCookie('csrftoken');
+const csrftoken = getCSRFToken('csrftoken');
 
 function ForgotPassword({ open, handleClose }) {
   const passwordResetUrl = window.DJANGO_URLS.PASSWORD_RESET;

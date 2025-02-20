@@ -19,5 +19,12 @@ module.exports = {
         options: { presets: ["@babel/preset-env", "@babel/preset-react"] }
       },
     ]
+  },
+  devtool: 'source-map',
+  stats: {
+    colors: true,
+    modules: true,
+    reasons: true,
+    errorDetails: true
   }
 };
