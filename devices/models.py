@@ -8,7 +8,7 @@ from employees.models import Employee
 class Device(models.Model):
     name = models.CharField(max_length=100)
     device_type = models.ForeignKey('DeviceType', on_delete=models.CASCADE)
-    mac_address = models.CharField(max_length=17)
+    mac_address = models.CharField(max_length=12)
     creation_date = models.DateTimeField(auto_now_add=True)
     linked_employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE, null=True)
 
