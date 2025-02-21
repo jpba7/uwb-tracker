@@ -12,12 +12,14 @@ import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import { TapAndPlayOutlined } from '@mui/icons-material';
 
 const mainListItems = [
   { text: 'Início', icon: <HomeRoundedIcon />, link: '/index'},
   { text: 'Funcionários', icon: <PeopleRoundedIcon />, link: '/employees'},
+  { text: 'Dispositivos', icon: <TapAndPlayOutlined />, link: '/devices'},
   { text: 'Heatmap Geral', icon: <MapOutlinedIcon />, link: '/heatmap'},
   { text: 'Analytics', icon: <AnalyticsRoundedIcon />, link: '/analytics'},
   { text: 'Tasks', icon: <AssignmentRoundedIcon />, link: '/tasks'},
