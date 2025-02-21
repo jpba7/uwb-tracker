@@ -9,8 +9,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from devices.models import Device, DeviceDataPoints
+from devices.models import Device, DeviceDataPoints, DeviceType
 from devices.serializers import DeviceDatapointSerializer
+
+from rest_framework import generics, status
+from .serializers import DeviceSerializer
+from .serializers import DeviceTypeSerializer
 
 
 class DeviceDataPointList(ListAPIView):
@@ -89,3 +93,54 @@ class DeviceDataPointHeatMap(APIView):
         ]
 
         return formatted_data
+
+
+class DevicesList(generics.ListAPIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+    serializer_class = DeviceSerializer
+    queryset = Device.objects.all().order_by('id')
+
+
+class DeviceCreate(generics.CreateAPIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+    serializer_class = DeviceSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response({
+                'id': serializer.instance.id,
+                'message': 'Device created successfully'
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeviceUpdate(generics.UpdateAPIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+    serializer_class = DeviceSerializer
+    queryset = Device.objects.all()
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response({
+                'id': serializer.instance.id,
+                'message': 'Device updated successfully'
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeviceDelete(generics.DestroyAPIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+    queryset = Device.objects.all()
+    lookup_field = 'id'
+
+
+class DeviceTypeList(generics.ListAPIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+    serializer_class = DeviceTypeSerializer
+    queryset = DeviceType.objects.all().order_by('name')
