@@ -31,8 +31,8 @@ const Heatmap = React.memo(({ employee_cpf = null, start_date = null, end_date =
     return data;
   };
 
-  const xAxisData = generateAxisData(0, 21, 1);
-  const yAxisData = generateAxisData(0, 20, 1);
+  const xAxisData = generateAxisData(0, 100, 1);
+  const yAxisData = generateAxisData(0, 200, 1);
 
   const option = {
     grid: {
@@ -101,7 +101,7 @@ const Heatmap = React.memo(({ employee_cpf = null, start_date = null, end_date =
       }
     ]
   };
-  return <ReactECharts option={option} opts={{ renderer: 'svg' }} />;
+  return <ReactECharts option={option} opts={{ renderer: 'canvas' }} />;
 });
 
 export default Heatmap;

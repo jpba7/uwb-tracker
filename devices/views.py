@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import Count, DecimalField, F
 from django.db.models.functions import Floor
 from django.utils.dateparse import parse_date
+from rest_framework import generics, status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -12,9 +13,7 @@ from rest_framework.views import APIView
 from devices.models import Device, DeviceDataPoints, DeviceType
 from devices.serializers import DeviceDatapointSerializer
 
-from rest_framework import generics, status
-from .serializers import DeviceSerializer
-from .serializers import DeviceTypeSerializer
+from .serializers import DeviceSerializer, DeviceTypeSerializer
 
 
 class DeviceDataPointList(ListAPIView):
