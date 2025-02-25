@@ -1,9 +1,15 @@
+import io
 from datetime import datetime
 from decimal import Decimal
 
+import pandas as pd
+import seaborn as sns
 from django.db.models import Count, DecimalField, F
 from django.db.models.functions import Floor
+from django.http import HttpResponse
 from django.utils.dateparse import parse_date
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
 from rest_framework import generics, status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
@@ -40,6 +46,64 @@ class DeviceDataPointList(ListAPIView):
                 timestamp__gte=datetime(2023, 1, 1), timestamp__lte=datetime(2023, 1, 2))  # TODO MUDAR PARA HOJE
 
         return datapoints.order_by('timestamp')
+
+
+class DeviceDataPointHeatMapSeaborn(APIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+
+    def get(self, request):
+        cpf = self.request.GET.get('cpf')
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        start_date = parse_date(start_date) if start_date else None
+        end_date = parse_date(end_date) if end_date else None
+
+        filters = {}
+
+        if start_date:
+            filters['timestamp__gte'] = start_date
+        if end_date:
+            filters['timestamp__lte'] = end_date
+
+        if cpf:
+            device = Device.objects.get(linked_employee__cpf=cpf, device_type__name='Tag')
+            filters['device'] = device
+
+        query = DeviceDataPoints.objects.filter(**filters)
+
+        # Convertendo queryset para DataFrame
+        df = pd.DataFrame.from_records(query.values('x', 'y'))
+
+        # Amostragem aleatória - ajuste o frac conforme necessário (ex: 0.1 = 10% dos dados)
+        df_sampled = df.sample(n=min(10000, len(df)), random_state=42)
+
+        # Criando figura do matplotlib
+        fig = Figure(figsize=(10, 8))
+        ax = fig.add_subplot(111)
+
+        # Gerando o heatmap com parâmetros otimizados
+        sns.kdeplot(
+            data=df_sampled,
+            x='x',
+            y='y',
+            fill=True,
+            thresh=0,
+            levels=50,  # Reduzindo número de níveis
+            bw_adjust=1.5,  # Aumentando a largura de banda
+            gridsize=100,  # Reduzindo a resolução do grid
+            cmap='viridis',
+            ax=ax
+        )
+
+        # Salvando a figura em um buffer
+        buf = io.BytesIO()
+        canvas = FigureCanvasAgg(fig)
+        canvas.print_png(buf)
+
+        # Retornando a imagem como resposta HTTP
+        response = HttpResponse(buf.getvalue(), content_type='image/png')
+        return response
 
 
 class DeviceDataPointHeatMap(APIView):
