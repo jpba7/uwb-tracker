@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const Heatmap = React.memo(({ employee_cpf = null, start_date = null, end_date = null}) => {
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imageData, setImageData] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
     
   useEffect(() => {
+    setLoading(true);
     const params = new URLSearchParams();
     
     if (employee_cpf) params.append('cpf', employee_cpf);
@@ -12,15 +16,54 @@ const Heatmap = React.memo(({ employee_cpf = null, start_date = null, end_date =
 
     const url = `/devices/datapoints/heatmap/seaborn${params.toString() ? `?${params}` : ''}`;
     
-    // Atualiza a URL da imagem para forçar o navegador a buscar uma nova versão
-    setImageUrl(url);
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Não há dados disponíveis para os parâmetros informados.');
+          }
+          throw new Error('Erro ao carregar o heatmap.');
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        // Criando URL a partir do blob recebido
+        const imageObjectUrl = URL.createObjectURL(blob);
+        setImageData(imageObjectUrl);
+        setError(null);
+      })
+      .catch(err => {
+        setError(err.message);
+        setImageData(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+      
+    // Limpeza do objectURL quando o componente desmontar
+    return () => {
+      if (imageData) {
+        URL.revokeObjectURL(imageData);
+      }
+    };
   }, [employee_cpf, start_date, end_date]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center' }}>
-      {imageUrl && (
+    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      {loading ? (
+        <CircularProgress color="primary" />
+      ) : error ? (
+        <div style={{ 
+          padding: '20px', 
+          textAlign: 'center',
+          color: '#666',
+          fontSize: '1.2em'
+        }}>
+          {error}
+        </div>
+      ) : (
         <img 
-          src={imageUrl} 
+          src={imageData} 
           alt="Heatmap"
           style={{
             maxWidth: '100%',
