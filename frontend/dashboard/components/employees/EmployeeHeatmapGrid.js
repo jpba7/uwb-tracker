@@ -12,6 +12,8 @@ import Footer from '../../internals/components/Footer';
 import Heatmap from '../../../graphs/Heatmap';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import ClearIcon from '@mui/icons-material/Clear';
+
 
 export default function EmployeeHeatmapGrid() {
   const { cpf } = useParams();
@@ -29,6 +31,15 @@ export default function EmployeeHeatmapGrid() {
     });
   };
 
+  const handleClearDates = () => {
+    setTempStartDate(null);
+    setTempEndDate(null);
+    setHeatmapDates({
+      start: null,
+      end: null
+    });
+  };
+
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       <Typography component="h2" variant="h6" sx={{ mb: 4 }}>
@@ -43,6 +54,7 @@ export default function EmployeeHeatmapGrid() {
               value={tempStartDate}
               format="DD/MM/YYYY"
               onChange={(newValue) => setTempStartDate(newValue)}
+              maxDate={tempEndDate || undefined}
               slotProps={{
                 textField: { size: 'standard' },
                 nextIconButton: { size: 'small' },
@@ -56,6 +68,7 @@ export default function EmployeeHeatmapGrid() {
               value={tempEndDate}
               format="DD/MM/YYYY"
               onChange={(newValue) => setTempEndDate(newValue)}
+              minDate={tempStartDate || undefined}
               slotProps={{
                 textField: { size: 'standard' },
                 nextIconButton: { size: 'small' },
@@ -65,18 +78,30 @@ export default function EmployeeHeatmapGrid() {
           </FormControl>
           <FormControl>
             <FormLabel sx={{ mb: 1 }}>&nbsp;</FormLabel>
-            <Button 
-              variant="contained" 
-              onClick={handleUpdateHeatmap}
-              sx={{ height: 45 }}
-            >
-              Atualizar
-            </Button>
+            <Stack direction="row" spacing={1}>
+              <Button 
+                variant="contained" 
+                onClick={handleUpdateHeatmap}
+                sx={{ height: 45 }}
+              >
+                Atualizar
+              </Button>
+              
+              <Button 
+                variant="outlined" 
+                startIcon={<ClearIcon />}
+                onClick={handleClearDates}
+                sx={{ height: 45 }}
+                disabled={!tempStartDate && !tempEndDate}
+              >
+                Limpar
+              </Button>
+            </Stack>
           </FormControl>
         </LocalizationProvider> 
       </Stack>
 
-      <Grid container spacing={2} columns={12}>
+      <Grid container sx={{ mt:2 }} spacing={2} columns={12}>
         <Grid size={{ xs: 12, lg: 12 }}>
           <Heatmap 
             employee_cpf={cpf}
