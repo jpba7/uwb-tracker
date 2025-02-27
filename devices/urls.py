@@ -1,10 +1,9 @@
 from django.urls import path
-from devices.views import DeviceDataPointList, DeviceDataPointHeatMap
+from devices.views import DeviceDataPointList
 from .views import DeviceDataPointHeatMapSeaborn, DeviceDelete, DevicesList, DeviceCreate, DeviceUpdate, DeviceTypeList
 
 urlpatterns = [
     path('datapoints', DeviceDataPointList.as_view(), name='device_data_points'),
-    path('datapoints/heatmap', DeviceDataPointHeatMap.as_view(), name='device_data_points_heatmap'),
     path('datapoints/heatmap/seaborn',
          DeviceDataPointHeatMapSeaborn.as_view(),
          name='device_data_points_heatmap_seaborn'),
