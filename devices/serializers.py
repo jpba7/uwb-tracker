@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from devices.models import Device, DeviceDataPoints, DeviceType
+from devices.models import Device, DeviceDataPoints, DeviceType, DeviceUserHistory
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -39,3 +39,14 @@ class DeviceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeviceType
         fields = ['id', 'name']
+
+
+class DeviceUserHistorySerializer(serializers.ModelSerializer):
+    device_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DeviceUserHistory
+        fields = ['id', 'device', 'device_name', 'employee', 'start_date', 'end_date', 'is_active']
+
+    def get_device_name(self, obj):
+        return obj.device.name if obj.device else None

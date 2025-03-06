@@ -209,3 +209,23 @@ class DeviceTypeList(generics.ListAPIView):
     permission_classes = [AllowAny]  # TODO REMOVER
     serializer_class = DeviceTypeSerializer
     queryset = DeviceType.objects.all().order_by('name')
+
+
+#########################
+## DEVICE USER HISTORY ##
+#########################
+
+class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint para visualização e edição de organizações.
+    Compatível com o padrão de UI Material para grids e formulários.
+    """
+    queryset = DeviceUserHistory.objects.all()
+    serializer_class = DeviceUserHistorySerializer
+    permission_classes = [AllowAny]  # TODO REMOVER
+
+    @action(detail=False, methods=['get'], url_path='employee/(?P<employee_id>\\d+)')
+    def by_employee(self, request, employee_id=None):
+        histories = self.queryset.filter(employee_id=employee_id).order_by('-start_date')
+        serializer = self.get_serializer(histories, many=True)
+        return Response(serializer.data)

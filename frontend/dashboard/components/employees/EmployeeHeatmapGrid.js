@@ -109,6 +109,14 @@ export default function EmployeeHeatmapGrid() {
             end_date={heatmapDates.end}
           />
         </Grid>
+
+        <Grid size={{ xs: 12, lg: 12 }}>
+          <DeviceHistoryCard 
+            employeeId={employee_id} 
+            onDateRangeSelect={handleHistoryDateSelect}
+          />
+        </Grid>
+
       </Grid>
       <Footer sx={{ my: 4 }} />
     </Box>

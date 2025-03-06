@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import CustomizedDataGrid from '../CustomizedDataGrid';
 
 const formatCPF = (cpf) => {
@@ -72,13 +73,28 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
     headerAlign: 'center',
     align: 'center',
     minWidth: 90,
-    sortable:false,
+    sortable: false,
     disableColumnMenu: true,
     renderCell: (params) => (
       <div>
-        <IconButton size="small" onClick={() => handleHeatmap(params.row)}>
-          <MapOutlinedIcon />
-        </IconButton>
+        <Tooltip 
+          title={params.row.has_device_history 
+            ? "Ver heatmap do funcionário" 
+            : "Funcionário sem histórico de dispositivos"}
+        >
+          <span>
+            <IconButton 
+              size="small" 
+              onClick={() => handleHeatmap(params.row)}
+              disabled={!params.row.has_device_history}
+              sx={{
+                color: params.row.has_device_history ? 'inherit' : 'rgba(0, 0, 0, 0.26)'
+              }}
+            >
+              <MapOutlinedIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
       </div>
     ),
   },
@@ -127,7 +143,7 @@ export default function EmployeeTable({rows, handleAdd, handleEdit, handleDelete
   const navigate = useNavigate();
 
   const handleHeatmap = (employee) => {
-    navigate(`/employees/${employee.cpf}/heatmap`);
+    navigate(`/employees/${employee.id}/heatmap`);
   };
 
   const columns = React.useMemo(() => createColumns(handleHeatmap, handleEdit, handleDelete), []);
@@ -135,7 +151,7 @@ export default function EmployeeTable({rows, handleAdd, handleEdit, handleDelete
   const formattedRows = React.useMemo(() => {
     return rows.map(employee => ({
       ...employee,
-      name: `${employee.first_name} ${employee.last_name}`
+      name: `${employee.first_name} ${employee.last_name}`,
     }));
   }, [rows]);
 

@@ -68,4 +68,17 @@ export const deviceService = {
       },
     });
   },
+
+  getDeviceHistory: async (employeeId) => {
+    const response = await fetch(`${API_URL}/device-history/employee/${employeeId}/`, {
+      method: 'GET',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Falha ao buscar histórico do dispositivo');
+    }
+    return response.json();
+  },
 };

@@ -1,8 +1,13 @@
-from django.urls import path
+from django.urls import include, path
 from devices.views import DeviceDataPointList
-from .views import DeviceDataPointHeatMapSeaborn, DeviceDelete, DevicesList, DeviceCreate, DeviceUpdate, DeviceTypeList
+from .views import DeviceDataPointHeatMapSeaborn, DeviceDelete, DevicesList, DeviceCreate, DeviceUpdate, DeviceTypeList, DeviceUserHistoryViewSet
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'api/device-history', DeviceUserHistoryViewSet)
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('datapoints', DeviceDataPointList.as_view(), name='device_data_points'),
     path('datapoints/heatmap/seaborn',
          DeviceDataPointHeatMapSeaborn.as_view(),
