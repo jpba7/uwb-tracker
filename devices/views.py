@@ -1,28 +1,31 @@
 import io
 from datetime import datetime
-from decimal import Decimal
 
 import matplotlib.image as mpimg
 import pandas as pd
-from scipy.datasets import face
 import seaborn as sns
-from django.db.models import Count, DecimalField, F
-from django.db.models.functions import Floor
 from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
-from rest_framework import generics, status
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 
-from devices.models import Device, DeviceDataPoints, DeviceType, DeviceUserHistory
+from devices.models import (Device, DeviceDataPoints, DeviceType,
+                            DeviceUserHistory)
 from devices.serializers import DeviceDatapointSerializer
 from employees.models import Employee
 
-from .serializers import DeviceSerializer, DeviceTypeSerializer
+from .serializers import (DeviceSerializer, DeviceTypeSerializer,
+                          DeviceUserHistorySerializer)
+
+#######################
+## DEVICE DATAPOINTS ##
+#######################
 
 
 class DeviceDataPointList(ListAPIView):
@@ -55,7 +58,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
     permission_classes = [AllowAny]  # TODO REMOVER
 
     def get(self, request):
-        cpf = self.request.GET.get('cpf')
+        employee_id = self.request.GET.get('id')
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
         device_id = self.request.GET.get('device_id')
@@ -70,8 +73,8 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         if end_date:
             filters['timestamp__lte'] = end_date
 
-        if cpf:
-            query = self.get_datapoints_for_employee(cpf)
+        if employee_id:
+            query = self.get_datapoints_for_employee(employee_id)
         elif device_id:
             query = self.get_datapoints_by_device_id(int(device_id))
         else:
@@ -102,9 +105,9 @@ class DeviceDataPointHeatMapSeaborn(APIView):
 
         return xy_points
 
-    def get_datapoints_for_employee(self, cpf: str):
+    def get_datapoints_for_employee(self, id: str):
         # Obtendo os pontos de dados do funcionário
-        employee = Employee.objects.get(cpf=cpf)
+        employee = Employee.objects.get(id=id)
         history_list = DeviceUserHistory.objects.get_all_device_history_from_employee(employee)
         xy_points = DeviceDataPoints.objects.get_xy_points_from_history_list(history_list)
 
@@ -160,6 +163,10 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         return buf.getvalue()
 
 
+#############
+## DEVICES ##
+#############
+
 class DevicesList(generics.ListAPIView):
     permission_classes = [AllowAny]  # TODO REMOVER
     serializer_class = DeviceSerializer
@@ -204,6 +211,10 @@ class DeviceDelete(generics.DestroyAPIView):
     queryset = Device.objects.all()
     lookup_field = 'id'
 
+
+##################
+## DEVICE TYPES ##
+##################
 
 class DeviceTypeList(generics.ListAPIView):
     permission_classes = [AllowAny]  # TODO REMOVER

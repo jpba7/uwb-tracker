@@ -1,14 +1,22 @@
 from rest_framework import generics, status
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .serializers import EmployeeSerializer
+from rest_framework.response import Response
+
 from .models import Employee
+from .serializers import EmployeeSerializer
 
 
 class EmployeesList(generics.ListAPIView):
+    queryset = Employee.objects.all()
     permission_classes = [AllowAny]  # TODO REMOVER
     serializer_class = EmployeeSerializer
     queryset = Employee.objects.all().order_by('id')
+
+
+class EmployeeDetail(generics.RetrieveAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    permission_classes = [AllowAny]  # TODO REMOVER
 
 
 class EmployeeCreate(generics.CreateAPIView):

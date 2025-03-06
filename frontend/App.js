@@ -18,7 +18,7 @@ function App() {
       <Routes>
         <Route path="/index" element={<Dashboard><MainGrid /></Dashboard>} />
         <Route path="/employees" element={<Dashboard><EmployeeGrid /></Dashboard>} />
-        <Route path="/employees/:cpf/heatmap" element={<Dashboard><EmployeeHeatmapGrid /></Dashboard>} />
+        <Route path="/employees/:employee_id/heatmap" element={<Dashboard><EmployeeHeatmapGrid /></Dashboard>} />
         <Route path="/devices" element={<Dashboard><DeviceGrid /></Dashboard>} />
         <Route path="/heatmap" element={<Dashboard><HeatmapGrid /></Dashboard>} />
 

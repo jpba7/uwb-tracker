@@ -18,6 +18,21 @@ const getCSRFToken = () => {
 };
 
 export const employeeService = {
+  
+  get: async(id) => {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'GET',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+      },
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw { response: { data: errorData } };
+    }
+    return response.json();
+  },
+  
   getAll: async () => {
     const response = await fetch(`${API_URL}/list`);
     return response.json();

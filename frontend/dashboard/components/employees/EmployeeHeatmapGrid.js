@@ -13,10 +13,11 @@ import Heatmap from '../../../graphs/Heatmap';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import ClearIcon from '@mui/icons-material/Clear';
-
+import EmployeeDataCard from './EmployeeDataCard';
+import DeviceHistoryCard from './DeviceHistoryCard';
 
 export default function EmployeeHeatmapGrid() {
-  const { cpf } = useParams();
+  const { employee_id } = useParams();
   const [tempStartDate, setTempStartDate] = React.useState(null);
   const [tempEndDate, setTempEndDate] = React.useState(null);
   const [heatmapDates, setHeatmapDates] = React.useState({
@@ -40,15 +41,28 @@ export default function EmployeeHeatmapGrid() {
     });
   };
 
+  const handleHistoryDateSelect = (startDate, endDate) => {
+    setTempStartDate(startDate);
+    setTempEndDate(endDate);
+    setHeatmapDates({
+      start: startDate?.format('YYYY-MM-DD'),
+      end: endDate?.format('YYYY-MM-DD')
+    });
+  };
+
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       <Typography component="h2" variant="h6" sx={{ mb: 4 }}>
         Heatmap
       </Typography>
       
-      <Stack direction="row" spacing={4} alignItems="flex-end">
+      <Stack 
+        direction={{ xs: 'column', md: 'row' }} 
+        spacing={{ xs: 2, md: 4 }} 
+        alignItems={{ xs: 'stretch', md: 'flex-end' }}
+      >
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <FormControl>
+          <FormControl >
             <FormLabel sx={{ mb: 1 }}>Data Inicial</FormLabel>
             <DatePicker
               value={tempStartDate}
@@ -56,7 +70,7 @@ export default function EmployeeHeatmapGrid() {
               onChange={(newValue) => setTempStartDate(newValue)}
               maxDate={tempEndDate || undefined}
               slotProps={{
-                textField: { size: 'standard' },
+                textField: { size: 'standard'},
                 nextIconButton: { size: 'small' },
                 previousIconButton: { size: 'small' },
               }}
@@ -70,19 +84,32 @@ export default function EmployeeHeatmapGrid() {
               onChange={(newValue) => setTempEndDate(newValue)}
               minDate={tempStartDate || undefined}
               slotProps={{
-                textField: { size: 'standard' },
+                textField: { size: 'standard'},
                 nextIconButton: { size: 'small' },
                 previousIconButton: { size: 'small' },
               }}
             />
           </FormControl>
           <FormControl>
-            <FormLabel sx={{ mb: 1 }}>&nbsp;</FormLabel>
-            <Stack direction="row" spacing={1}>
+            <FormLabel sx={{ 
+              mb: { xs: 0, md: 1 },
+              display: { xs: 'none', md: 'block' }
+            }}>
+              &nbsp;
+            </FormLabel>
+            <Stack 
+              direction="row" 
+              spacing={1}
+              sx={{ 
+                width: '100%',
+                justifyContent: { xs: 'space-between', md: 'flex-start' },
+                mt: { xs: 1, md: 0 }
+              }}
+            >
               <Button 
                 variant="contained" 
                 onClick={handleUpdateHeatmap}
-                sx={{ height: 45 }}
+                sx={{ height: 45, flex: { xs: 1, md: 'none' } }}
               >
                 Atualizar
               </Button>
@@ -91,7 +118,7 @@ export default function EmployeeHeatmapGrid() {
                 variant="outlined" 
                 startIcon={<ClearIcon />}
                 onClick={handleClearDates}
-                sx={{ height: 45 }}
+                sx={{ height: 45, flex: { xs: 1, md: 'none' } }}
                 disabled={!tempStartDate && !tempEndDate}
               >
                 Limpar
@@ -104,7 +131,7 @@ export default function EmployeeHeatmapGrid() {
       <Grid container sx={{ mt:2 }} spacing={2} columns={12}>
         <Grid size={{ xs: 12, lg: 12 }}>
           <Heatmap 
-            employee_cpf={cpf}
+            employee_id={employee_id}
             start_date={heatmapDates.start}
             end_date={heatmapDates.end}
           />
@@ -117,7 +144,11 @@ export default function EmployeeHeatmapGrid() {
           />
         </Grid>
 
+        <Grid size={{ xs: 12, lg: 12 }}>
+          <EmployeeDataCard employeeId={employee_id} />
+        </Grid>
       </Grid>
+
       <Footer sx={{ my: 4 }} />
     </Box>
   );
