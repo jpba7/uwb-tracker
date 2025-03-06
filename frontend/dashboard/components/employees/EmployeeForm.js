@@ -62,13 +62,36 @@ export default function EmployeeForm({ open, handleClose, employee, onSubmit }) 
 
   useEffect(() => {
     if (employee) {
+      // Função para formatar CPF
+      const formatCPF = (cpf) => {
+        return cpf
+          .replace(/\D/g, '')
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d{1,2})/, '$1-$2');
+      };
+
+      // Função para formatar telefone
+      const formatPhone = (phone) => {
+        const numbers = phone.replace(/\D/g, '');
+        if (numbers.length <= 10) {
+          return numbers
+            .replace(/(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{4})(\d)/, '$1-$2');
+        } else {
+          return numbers
+            .replace(/(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{5})(\d)/, '$1-$2');
+        }
+      };
+
       setFormData({
         first_name: employee.first_name || '',
         last_name: employee.last_name || '',
-        cpf: employee.cpf || '',
+        cpf: employee.cpf ? formatCPF(employee.cpf) : '',
         email: employee.email || '',
-        phone: employee.phone || '',
-        emergency_contact: employee.emergency_contact || '',
+        phone: employee.phone ? formatPhone(employee.phone) : '',
+        emergency_contact: employee.emergency_contact ? formatPhone(employee.emergency_contact) : '',
         address: employee.address || '',
       });
     } else {
