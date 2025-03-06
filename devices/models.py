@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 
 class Device(models.Model):
@@ -54,11 +55,21 @@ class DeviceDataPointManager(models.Manager):
         # Cria um Q object para combinar todas as condições
         queries = Q()
         for device, start_date, end_date in history_list:
-            queries |= Q(
-                device=device,
-                timestamp__gte=start_date,
-                timestamp__lte=end_date
-            )
+            # Inicia com a condição do device que é obrigatória
+            device_query = Q(device=device)
+
+            # Adiciona filtros de data apenas se não forem None
+            if start_date:
+                if timezone.is_naive(start_date):
+                    start_date = timezone.make_aware(start_date)
+                device_query &= Q(timestamp__gte=start_date)
+            if end_date:
+                if timezone.is_naive(end_date):
+                    end_date = timezone.make_aware(end_date)
+                device_query &= Q(timestamp__lte=end_date)
+
+            # Combina com as queries anteriores
+            queries |= device_query
 
         return self.filter(queries)
 
