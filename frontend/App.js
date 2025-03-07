@@ -9,6 +9,7 @@ import EmployeeHeatmapGrid from './dashboard/components/employees/EmployeeHeatma
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/pt-br';
+import EmployeeTrackerGrid from './dashboard/components/employees/EmployeeTrackerGrid';
 //import NotFound from './NotFound';
 
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/index" element={<Dashboard><MainGrid /></Dashboard>} />
         <Route path="/employees" element={<Dashboard><EmployeeGrid /></Dashboard>} />
         <Route path="/employees/:employee_id/heatmap" element={<Dashboard><EmployeeHeatmapGrid /></Dashboard>} />
+        <Route path="/employees/:employee_id/tracker" element={<Dashboard><EmployeeTrackerGrid /></Dashboard>} />
         <Route path="/devices" element={<Dashboard><DeviceGrid /></Dashboard>} />
         <Route path="/heatmap" element={<Dashboard><HeatmapGrid /></Dashboard>} />
 

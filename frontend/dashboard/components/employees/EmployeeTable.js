@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import CustomizedDataGrid from '../CustomizedDataGrid';
@@ -19,7 +20,7 @@ const formatPhone = (phone) => {
   return cleanPhone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
 };
 
-const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
+const createColumns = (handleTracker, handleHeatmap, handleEdit, handleDelete) => [
   { 
     field: 'id',
     headerName: 'ID',
@@ -66,6 +67,37 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
     flex: 1,
     minWidth: 150,
     disableColumnMenu: true
+  },
+  {
+    field: 'track',
+    headerName: 'Tracker',
+    headerAlign: 'center',
+    align: 'center',
+    minWidth: 90,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => (
+      <div>
+        <Tooltip 
+          title={params.row.has_device_history 
+            ? "Ver movimentação do funcionário" 
+            : "Funcionário sem histórico de movimentação"}
+        >
+          <span>
+            <IconButton 
+              size="small" 
+              onClick={() => handleTracker(params.row)}
+              disabled={!params.row.has_device_history}
+              sx={{
+                color: params.row.has_device_history ? 'inherit' : 'rgba(0, 0, 0, 0.26)'
+              }}
+            >
+              <LocationOnOutlinedIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </div>
+    ),
   },
   {
     field: 'heatmap',
@@ -146,7 +178,11 @@ export default function EmployeeTable({rows, handleAdd, handleEdit, handleDelete
     navigate(`/employees/${employee.id}/heatmap`);
   };
 
-  const columns = React.useMemo(() => createColumns(handleHeatmap, handleEdit, handleDelete), []);
+  const handleTracker = (employee) => {
+    navigate(`/employees/${employee.id}/tracker`);
+  };
+
+  const columns = React.useMemo(() => createColumns(handleTracker, handleHeatmap, handleEdit, handleDelete), []);
 
   const formattedRows = React.useMemo(() => {
     return rows.map(employee => ({

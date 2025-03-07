@@ -22,6 +22,10 @@ from employees.models import Employee
 
 from .serializers import (DeviceSerializer, DeviceTypeSerializer,
                           DeviceUserHistorySerializer)
+import matplotlib.animation as animation
+import numpy as np
+import tempfile
+import os
 
 #######################
 ## DEVICE DATAPOINTS ##
@@ -161,6 +165,49 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         canvas.print_png(buf)
 
         return buf.getvalue()
+
+
+class DeviceDataPointAnimation(APIView):
+    permission_classes = [AllowAny]  # TODO REMOVER
+
+    def get(self, request):
+        employee_id = self.request.GET.get('id')
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+        device_id = self.request.GET.get('device_id')
+
+        start_date = parse_date(start_date) if start_date else None
+        end_date = parse_date(end_date) if end_date else None
+
+        filters = {}
+
+        if start_date:
+            filters['timestamp__gte'] = start_date
+        if end_date:
+            filters['timestamp__lte'] = end_date
+
+        if employee_id:
+            query = self.get_datapoints_for_employee(employee_id)
+        elif device_id:
+            query = self.get_datapoints_by_device_id(int(device_id))
+        else:
+            query = DeviceDataPoints.objects.all()
+
+        query = query.filter(**filters)
+
+        # Convertendo queryset para lista de dados
+        data_points = list(query.values('x', 'y', 'timestamp').order_by('timestamp'))
+
+        return Response(data_points)
+
+    def get_datapoints_by_device_id(self, device_id: int):
+        device = Device.objects.get(id=device_id)
+        return DeviceDataPoints.objects.filter(device=device)
+
+    def get_datapoints_for_employee(self, employee_id: str):
+        employee = Employee.objects.get(id=employee_id)
+        history_list = DeviceUserHistory.objects.get_all_device_history_from_employee(employee)
+        return DeviceDataPoints.objects.get_xy_points_from_history_list(history_list)
 
 
 #############

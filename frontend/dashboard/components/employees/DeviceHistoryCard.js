@@ -106,7 +106,9 @@ const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
                 <TableCell sx={{ fontWeight: 'bold' }}>Início</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Fim</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }} align="right">Ações</TableCell>
+                {onDateRangeSelect && (
+                  <TableCell sx={{ fontWeight: 'bold' }} align="right">Ações</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -122,15 +124,17 @@ const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleUpdateHeatmap(history.start_date, history.end_date)}
-                      title="Visualizar período no heatmap"
-                    >
-                      <UpdateIcon />
-                    </IconButton>
-                  </TableCell>
+                  {onDateRangeSelect && (
+                    <TableCell align="right">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleUpdateHeatmap(history.start_date, history.end_date)}
+                        title="Visualizar período no heatmap"
+                      >
+                        <UpdateIcon />
+                      </IconButton>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
