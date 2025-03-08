@@ -50,7 +50,7 @@ export function SitemarkIconWithText() {
         </svg>
       </SvgIcon>
       <Typography variant="h6" sx={{ marginLeft: 1, fontFamily: 'Roboto, sans-serif', color: color }}>
-        Telescope
+        UWB Tracker
       </Typography>
     </Box>
   );

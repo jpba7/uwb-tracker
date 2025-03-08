@@ -21,7 +21,7 @@ export default function NavbarBreadcrumbs() {
       aria-label="breadcrumb"
       separator={<NavigateNextRoundedIcon fontSize="small" />}
     >
-      <Typography variant="body1">Telescope</Typography>
+      <Typography variant="body1">UWB Tracker</Typography>
       <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600 }}>
         Início
       </Typography>

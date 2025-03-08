@@ -64,7 +64,7 @@ export default function AppNavbar() {
           >
             <SitemarkIcon />
             <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
-              Telescope
+              UWB Tracker
             </Typography>
           </Stack>
           <ColorModeIconDropdown />
