@@ -15,7 +15,6 @@ class DeviceSerializer(serializers.ModelSerializer):
             'name',
             'device_type',
             'device_type_name',
-            'mac_address',
             'creation_date',
             'linked_employee',
             'linked_employee_name']

@@ -63,19 +63,9 @@ const selectSX = {
   },
 }
 
-const formatMacAddress = (mac) => {
-  const cleanMac = mac.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
-  return cleanMac
-    .slice(0, 12) // Limita a 12 caracteres
-    .match(/.{1,2}/g)?.join(':') || '';
-};
-
-const cleanMacAddress = (mac) => mac.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
-
 export default function DeviceForm({ open, handleClose, device, onSubmit }) {
   const [formData, setFormData] = useState({
     name: '',
-    mac_address: '',
     device_type: '',
     linked_employee: null,
   });
@@ -102,14 +92,12 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
   
         setFormData({
           name: device.name || '',
-          mac_address: device.mac_address ? formatMacAddress(device.mac_address) : '',
           device_type: device.device_type || '',
           linked_employee: linkedEmployeeData,
         });
       } else {
         setFormData({
           name: '',
-          mac_address: '',
           device_type: '',
           linked_employee: null,
         });
@@ -139,31 +127,21 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
     if (device) {
       setFormData({
         name: device.name || '',
-        mac_address: device.mac_address ? formatMacAddress(device.mac_address) : '',
         device_type: device.device_type || '',
         linked_employee: device.linked_employee || null,
       });
     } else {
       setFormData({
         name: '',
-        mac_address: '',
         device_type: '',
         linked_employee: null,
       });
     }
   }, [device]);
 
-  const validateMacAddress = (mac) => {
-    return /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/.test(mac);
-  };
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     let formattedValue = value;
-
-    if (name === 'mac_address') {
-      formattedValue = formatMacAddress(value);
-    }
 
     setFormData({
       ...formData,
@@ -184,11 +162,6 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
     if (!formData.device_type) {
       newErrors.device_type = 'Tipo de dispositivo é obrigatório';
     }
-    if (!formData.mac_address) {
-      newErrors.mac_address = 'Endereço MAC é obrigatório';
-    } else if (!validateMacAddress(formData.mac_address)) {
-      newErrors.mac_address = 'Endereço MAC inválido (formato: XX:XX:XX:XX:XX:XX)';
-    }
     if (!formData.linked_employee) {
       newErrors.linked_employee = 'Funcionário é obrigatório';
     }
@@ -203,7 +176,6 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
 
     const cleanedFormData = {
       ...formData,
-      mac_address: cleanMacAddress(formData.mac_address),
       linked_employee: formData.linked_employee?.id || null
     };
 
@@ -276,19 +248,6 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
                 </Typography>
               )}
             </FormControl>
-
-            <TextField
-              required
-              fullWidth
-              label="Endereço MAC"
-              name="mac_address"
-              value={formData.mac_address}
-              onChange={handleChange}
-              error={!!errors.mac_address}
-              helperText={errors.mac_address}
-              placeholder="XX:XX:XX:XX:XX:XX"
-              sx={textFieldSX}
-            />
 
             <Autocomplete
               value={formData.linked_employee}
