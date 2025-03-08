@@ -6,12 +6,26 @@ from django.db.models import Q
 from django.utils import timezone
 
 
+class DeviceManager(models.Manager):
+    def get_or_create_tag(self, tag_id: str):
+        device_type, _ = DeviceType.objects.get_or_create(name='Tag')
+        device, _ = self.get_or_create(
+            name=tag_id,
+            defaults={
+                'device_type': device_type,
+                'mac_address': None
+            }
+        )
+        return device
+
+
 class Device(models.Model):
     name = models.CharField(max_length=100)
     device_type = models.ForeignKey('DeviceType', on_delete=models.CASCADE)
     mac_address = models.CharField(max_length=12)
     creation_date = models.DateTimeField(auto_now_add=True)
     linked_employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE, null=True)
+    objects: DeviceManager = DeviceManager()
 
     def __str__(self):
         return f'{self.device_type.name}: {self.name}'

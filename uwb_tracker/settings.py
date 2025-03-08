@@ -21,6 +21,7 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / 'frontend'
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,7 +34,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('ENVIRONMENT') == 'dev'
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '0.0.0.0']
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://']
 
@@ -42,7 +43,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
 
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
     'rest_framework',
     'uwb_tracker',
     'corsheaders',
@@ -156,8 +158,11 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'static'
 
-if os.getenv('ENVIRONMENT') == 'dev':
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend/static-local')]
+STATICFILES_DIRS = [FRONTEND_DIR / 'static-local']
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+WHITENOISE_ROOT = BASE_DIR / 'static' / 'root'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -165,9 +170,8 @@ if os.getenv('ENVIRONMENT') == 'dev':
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWS_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Redirect
 LOGIN_REDIRECT_URL = '/index'

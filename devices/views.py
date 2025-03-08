@@ -21,7 +21,7 @@ from devices.serializers import DeviceDatapointSerializer
 from employees.models import Employee
 
 from .serializers import (DeviceSerializer, DeviceTypeSerializer,
-                          DeviceUserHistorySerializer)
+                          DeviceUserHistorySerializer, BatchPositionSerializer)
 import matplotlib.animation as animation
 import numpy as np
 import tempfile
@@ -287,3 +287,18 @@ class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
         histories = self.queryset.filter(employee_id=employee_id).order_by('-start_date')
         serializer = self.get_serializer(histories, many=True)
         return Response(serializer.data)
+
+
+class BatchPositionCreate(generics.CreateAPIView):
+    serializer_class = BatchPositionSerializer
+    permission_classes = [AllowAny]  # TODO REMOVER E BOTAR BEARER TOKEN
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            result = serializer.save()
+            return Response({
+                'message': 'Positions created successfullpy',
+                'created': result['created']
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

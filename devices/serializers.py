@@ -50,3 +50,35 @@ class DeviceUserHistorySerializer(serializers.ModelSerializer):
 
     def get_device_name(self, obj):
         return obj.device.name if obj.device else None
+
+
+class PositionSerializer(serializers.Serializer):
+    tag_id = serializers.CharField()
+    timestamp = serializers.FloatField()
+    x = serializers.FloatField()
+    y = serializers.FloatField()
+    z = serializers.FloatField()
+    created_at = serializers.DateTimeField()
+
+
+class BatchPositionSerializer(serializers.Serializer):
+    positions = PositionSerializer(many=True)
+
+    def create(self, validated_data):
+        positions = validated_data.get('positions', [])
+        data_points = []
+
+        for position in positions:
+            device = Device.objects.get_or_create_tag(position['tag_id'])
+
+            data_point = DeviceDataPoints(
+                device=device,
+                x=position['x'],
+                y=position['y'],
+                z=position['z'],
+                timestamp=position['created_at']
+            )
+            data_points.append(data_point)
+
+        DeviceDataPoints.objects.bulk_create(data_points)
+        return {'created': len(data_points)}
