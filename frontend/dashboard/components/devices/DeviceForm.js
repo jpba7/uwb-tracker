@@ -162,9 +162,6 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
     if (!formData.device_type) {
       newErrors.device_type = 'Tipo de dispositivo é obrigatório';
     }
-    if (!formData.linked_employee) {
-      newErrors.linked_employee = 'Funcionário é obrigatório';
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -235,6 +232,7 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
                 value={formData.device_type}
                 onChange={handleChange}
                 label="Tipo de Dispositivo"
+                required
               >
                 {deviceTypes.map((type) => (
                   <MenuItem key={type.id} value={type.id}>
@@ -269,7 +267,6 @@ export default function DeviceForm({ open, handleClose, device, onSubmit }) {
                 <TextField
                   {...params}
                   label="Funcionário"
-                  required
                   error={!!errors.linked_employee}
                   helperText={errors.linked_employee}
                   sx={textFieldSX}
