@@ -1,8 +1,10 @@
 import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomizedDataGrid from '../CustomizedDataGrid';
+import { Tooltip } from '@mui/material';
 
 const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
   { 
@@ -40,6 +42,29 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
     flex: 1,
     minWidth: 180,
     disableColumnMenu: true
+  },
+  {
+    field: 'heatmap',
+    headerName: 'Heatmap',
+    headerAlign: 'center',
+    align: 'center',
+    minWidth: 90,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => (
+      <div>
+        <Tooltip title="Ver heatmap do dispositivo">
+          <span>
+            <IconButton 
+              size="small" 
+              onClick={() => handleHeatmap(params.row)}
+            >
+              <MapOutlinedIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </div>
+    ),
   },
   {
     field: 'edit',

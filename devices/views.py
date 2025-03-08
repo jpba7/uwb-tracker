@@ -62,10 +62,10 @@ class DeviceDataPointHeatMapSeaborn(APIView):
     permission_classes = [AllowAny]  # TODO REMOVER
 
     def get(self, request):
-        employee_id = self.request.GET.get('id')
+        employee_id = self.request.GET.get('employee_id')
+        device_id = self.request.GET.get('device_id')
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
-        device_id = self.request.GET.get('device_id')
 
         start_date = parse_date(start_date) if start_date else None
         end_date = parse_date(end_date) if end_date else None
@@ -80,7 +80,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         if employee_id:
             query = self.get_datapoints_for_employee(employee_id)
         elif device_id:
-            query = self.get_datapoints_by_device_id(int(device_id))
+            query = self.get_datapoints_by_device_id(device_id)
         else:
             query = DeviceDataPoints.objects.all()
 
@@ -102,16 +102,16 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         response = HttpResponse(heatmap_img_bytes, content_type='image/png')
         return response
 
-    def get_datapoints_by_device_id(self, device_id: int):
+    def get_datapoints_by_device_id(self, device_id: str):
         # Obtendo os pontos de dados do dispositivo
         device = Device.objects.get(id=device_id)
         xy_points = DeviceDataPoints.objects.filter(device=device)
 
         return xy_points
 
-    def get_datapoints_for_employee(self, id: str):
+    def get_datapoints_for_employee(self, employee_id: str):
         # Obtendo os pontos de dados do funcionário
-        employee = Employee.objects.get(id=id)
+        employee = Employee.objects.get(id=employee_id)
         history_list = DeviceUserHistory.objects.get_all_device_history_from_employee(employee)
         xy_points = DeviceDataPoints.objects.get_xy_points_from_history_list(history_list)
 

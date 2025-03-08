@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 
-const Heatmap = React.memo(({ employee_id = null, start_date = null, end_date = null}) => {
+const Heatmap = React.memo(({ employee_id = null, device_id = null, start_date = null, end_date = null}) => {
   const [imageData, setImageData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,8 @@ const Heatmap = React.memo(({ employee_id = null, start_date = null, end_date = 
     setLoading(true);
     const params = new URLSearchParams();
     
-    if (employee_id) params.append('id', employee_id);
+    if (employee_id) params.append('employee_id', employee_id);
+    if (device_id) params.append('device_id', device_id);
     if (start_date) params.append('start_date', start_date);
     if (end_date) params.append('end_date', end_date);
 
