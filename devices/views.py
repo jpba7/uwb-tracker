@@ -146,10 +146,10 @@ class DeviceDataPointHeatMapSeaborn(APIView):
             x='x',
             y='y',
             fill=True,
-            thresh=0,
+            thresh=0.001,
             levels=100,
-            bw_adjust=1.5,
-            gridsize=75,
+            bw_adjust=0.5,
+            gridsize=100,
             cmap='Spectral_r',
             alpha=0.6,
             ax=ax
