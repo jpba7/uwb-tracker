@@ -7,8 +7,9 @@ import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import MenuContent from './MenuContent';
-import CardAlert from './CardAlert';
-import OptionsMenu from './OptionsMenu';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import IconButton from '@mui/material/IconButton';
+
 import { SitemarkIconWithText } from '../../shared-theme/CustomIcons'
 
 const drawerWidth = 240;
@@ -79,7 +80,21 @@ export default function SideMenu() {
             riley@email.com
           </Typography>
         </Box>
-        <OptionsMenu />
+        <IconButton
+          onClick={() => {
+            window.location.href = "/accounts/logout/";
+          }}
+          size="small"
+          color="inherit"
+          aria-label="logout"
+          sx={{
+            '&:hover': {
+              color: 'error.main',
+            },
+          }}
+        >
+          <LogoutRoundedIcon />
+        </IconButton>
       </Stack>
     </Drawer>
   );
