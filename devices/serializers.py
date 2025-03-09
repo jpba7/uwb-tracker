@@ -42,14 +42,31 @@ class DeviceTypeSerializer(serializers.ModelSerializer):
 
 class DeviceUserHistorySerializer(serializers.ModelSerializer):
     device_name = serializers.SerializerMethodField()
+    employee_name = serializers.SerializerMethodField('get_employee_full_name')
+    start_date = serializers.SerializerMethodField('get_formatted_start_date')
+    end_date = serializers.SerializerMethodField('get_formatted_end_date')
 
     class Meta:
         model = DeviceUserHistory
-        fields = ['id', 'device', 'device_name', 'employee', 'start_date', 'end_date', 'is_active']
+        fields = ['id', 'device', 'device_name', 'employee', 'employee_name', 'start_date', 'end_date', 'is_active']
 
     def get_device_name(self, obj):
         return obj.device.name if obj.device else None
-
+    
+    def get_employee_full_name(self, obj: DeviceUserHistory) -> str:
+        if obj.employee:
+            return f'{obj.employee.first_name} {obj.employee.last_name}'.strip()
+        return ''
+    
+    def get_formatted_start_date(self, obj: DeviceUserHistory) -> str:
+        if obj.start_date:
+            return obj.start_date.strftime('%d/%m/%Y')
+        return ''
+    
+    def get_formatted_end_date(self, obj: DeviceUserHistory) -> str:
+        if obj.end_date:
+            return obj.end_date.strftime('%d/%m/%Y')
+        return ''
 
 class PositionSerializer(serializers.Serializer):
     tag_id = serializers.CharField()

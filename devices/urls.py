@@ -6,7 +6,7 @@ from .views import (DeviceDataPointAnimation, DeviceDataPointHeatMapSeaborn,
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'api/device-history', DeviceUserHistoryViewSet)
+router.register(r'api/device-history', DeviceUserHistoryViewSet, basename='device-history')
 
 urlpatterns = [
     path('', include(router.urls)),

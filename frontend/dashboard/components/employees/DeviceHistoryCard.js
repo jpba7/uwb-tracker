@@ -17,7 +17,7 @@ import {
 import HistoryIcon from '@mui/icons-material/History';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import UpdateIcon from '@mui/icons-material/Update';
-import { deviceService } from '../../../services/deviceService';
+import { deviceHistoryService } from '../../../services/deviceHistoryService';
 import dayjs from 'dayjs';
 
 const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
@@ -27,7 +27,7 @@ const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
   useEffect(() => {
     const fetchHistories = async () => {
       try {
-        const data = await deviceService.getDeviceHistory(employeeId);
+        const data = await deviceHistoryService.getDeviceHistory(employeeId);
         setHistories(data);
       } catch (error) {
         console.error('Error fetching device histories:', error);

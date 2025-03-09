@@ -5,7 +5,7 @@ import matplotlib.image as mpimg
 import pandas as pd
 import seaborn as sns
 from django.http import HttpResponse
-from django.utils.dateparse import parse_date
+from django.utils.dateparse import parse_date, parse_datetime
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 from rest_framework import generics, permissions, status, viewsets
@@ -22,10 +22,7 @@ from employees.models import Employee
 
 from .serializers import (DeviceSerializer, DeviceTypeSerializer,
                           DeviceUserHistorySerializer, BatchPositionSerializer)
-import matplotlib.animation as animation
-import numpy as np
-import tempfile
-import os
+
 
 #######################
 ## DEVICE DATAPOINTS ##
@@ -273,20 +270,45 @@ class DeviceTypeList(generics.ListAPIView):
 ## DEVICE USER HISTORY ##
 #########################
 
+from django.utils import timezone
+
 class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
     """
     API endpoint para visualização e edição de organizações.
     Compatível com o padrão de UI Material para grids e formulários.
     """
-    queryset = DeviceUserHistory.objects.all()
     serializer_class = DeviceUserHistorySerializer
     permission_classes = [AllowAny]  # TODO REMOVER
+
+    def get_queryset(self):
+        return DeviceUserHistory.objects.all().order_by('id')
 
     @action(detail=False, methods=['get'], url_path='employee/(?P<employee_id>\\d+)')
     def by_employee(self, request, employee_id=None):
         histories = self.queryset.filter(employee_id=employee_id).order_by('-start_date')
         serializer = self.get_serializer(histories, many=True)
         return Response(serializer.data)
+    
+    # TODO Fazer método de update e create com regras para não sobrepor datas de mesma tag
+
+    def perform_update(self, serializer):
+        start_date = self.request.data.get('start_date')
+        end_date = self.request.data.get('end_date')
+        
+        data = {
+            'device_id': self.request.data.get('device'),
+            'employee_id': self.request.data.get('employee'),
+            'is_active': self.request.data.get('is_active'),
+        }
+        
+        if start_date:
+            naive_dt = parse_datetime(f"{start_date} 00:00:00")
+            data['start_date'] = timezone.make_aware(naive_dt)
+        if end_date:
+            naive_dt = parse_datetime(f"{end_date} 00:00:00")
+            data['end_date'] = timezone.make_aware(naive_dt)
+            
+        serializer.save(**data)
 
 
 class BatchPositionCreate(generics.CreateAPIView):

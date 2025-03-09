@@ -13,11 +13,13 @@ import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
 import { Link } from 'react-router-dom';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import { TapAndPlayOutlined } from '@mui/icons-material';
+import HistoryIcon from '@mui/icons-material/History';
 
 const mainListItems = [
   { text: 'Início', icon: <HomeRoundedIcon />, link: '/index'},
   { text: 'Funcionários', icon: <PeopleRoundedIcon />, link: '/employees'},
   { text: 'Dispositivos', icon: <TapAndPlayOutlined />, link: '/devices'},
+  { text: 'Histórico de Uso', icon: <HistoryIcon />, link: '/device-histories'},
   { text: 'Heatmap Geral', icon: <MapOutlinedIcon />, link: '/heatmap'},
 ];
 
