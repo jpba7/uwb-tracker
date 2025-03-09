@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import MenuContent from './MenuContent';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import IconButton from '@mui/material/IconButton';
+import { useUser } from '../../contexts/UserContext';
 
 import { SitemarkIconWithText } from '../../shared-theme/CustomIcons'
 
@@ -26,6 +27,8 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
+  const { user, loading } = useUser();
+
   return (
     <Drawer
       variant="permanent"
@@ -68,16 +71,16 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
-          src="/static/images/avatar/7.jpg"
+          alt={user?.name || 'User'}
+          src={user?.avatar || "/static/images/avatar/default.jpg"}
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Riley Carter
+            {loading ? 'Loading...' : (user?.name || 'User')}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            riley@email.com
+            {loading ? 'Loading...' : (user?.email || '')}
           </Typography>
         </Box>
         <IconButton
