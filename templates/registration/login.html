@@ -2,13 +2,13 @@
 <html lang="pt">
 
 {% load static %}
-{% csrf_token %}
 
 <head>
     <link rel="favicon" type="image/png" src="{% static 'favicon.ico' %}"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    {% csrf_token %}
     <script>
         window.DJANGO_URLS = {
             PASSWORD_RESET: "{% url 'password_reset' %}"
@@ -17,7 +17,6 @@
 </head>
 <body>
     <script src="{% static 'login-bundle.js' %}"></script>
-
     <div id="root"></div>
 </body>
 </html>

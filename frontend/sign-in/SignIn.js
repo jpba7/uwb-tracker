@@ -15,8 +15,9 @@ import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import { SitemarkIcon, SitemarkIconWithText } from '../shared-theme/CustomIcons';
 import { getCSRFToken } from '../utils'
+import { authService } from '../services/authService';
 
-const csrftoken = getCSRFToken('csrftoken')
+const csrftoken = getCSRFToken()
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -102,6 +103,31 @@ export default function SignIn(props) {
     return isValid;
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+    if (!validateInputs()) return;
+
+    try {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        // Get a fresh CSRF token before making the request
+        await fetch('/api/auth/login/', { 
+            method: 'GET',
+            credentials: 'include'
+        });
+        
+        await authService.login(username, password);
+        window.location.href = '/index';
+    } catch (error) {
+        console.error('Login error:', error);
+        setUsernameError(true);
+        setPasswordError(true);
+        setPasswordErrorMessage('Credenciais inválidas');
+    }
+  };
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -119,6 +145,7 @@ export default function SignIn(props) {
             component="form"
             method="POST"
             noValidate
+            onSubmit={handleSubmit}
             sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -168,7 +195,6 @@ export default function SignIn(props) {
               type="submit"
               fullWidth
               variant="contained"
-              onClick={validateInputs}
               sx={{ mt: 2 }}
             >
               Entrar

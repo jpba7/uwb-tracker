@@ -22,6 +22,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
+from django.contrib.auth import views as auth_views
+from . import views
 
 favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
@@ -32,7 +34,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 
 urlpatterns = [
-    path('', views.LoginView.as_view(), name='my_login'),
+    path('', auth_views.LoginView.as_view(), name='my_login'),
     path('index', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('django/accounts/', include('django.contrib.auth.urls')),
@@ -41,5 +43,10 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('devices/', include('devices.urls')),
     path('employees/', include('employees.urls')),
+    path('api/auth/', include([
+        path('login/', views.LoginView.as_view(), name='api-login'),
+        path('logout/', views.LogoutView.as_view(), name='api-logout'),
+        path('user/', views.UserView.as_view(), name='api-user'),
+    ])),
     re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]

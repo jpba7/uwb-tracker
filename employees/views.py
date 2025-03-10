@@ -1,5 +1,5 @@
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Employee
@@ -8,7 +8,7 @@ from .serializers import EmployeeSerializer
 
 class EmployeesList(generics.ListAPIView):
     queryset = Employee.objects.all()
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = EmployeeSerializer
     queryset = Employee.objects.all().order_by('id')
 
@@ -16,11 +16,11 @@ class EmployeesList(generics.ListAPIView):
 class EmployeeDetail(generics.RetrieveAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
 
 
 class EmployeeCreate(generics.CreateAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = EmployeeSerializer
 
     def create(self, request, *args, **kwargs):
@@ -35,7 +35,7 @@ class EmployeeCreate(generics.CreateAPIView):
 
 
 class EmployeeUpdate(generics.UpdateAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = EmployeeSerializer
     queryset = Employee.objects.all()
     lookup_field = 'id'
@@ -53,6 +53,6 @@ class EmployeeUpdate(generics.UpdateAPIView):
 
 
 class EmployeeDelete(generics.DestroyAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     queryset = Employee.objects.all()
     lookup_field = 'id'

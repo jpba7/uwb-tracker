@@ -8,9 +8,9 @@ from django.http import HttpResponse
 from django.utils.dateparse import parse_date, parse_datetime
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -28,9 +28,8 @@ from .serializers import (DeviceSerializer, DeviceTypeSerializer,
 ## DEVICE DATAPOINTS ##
 #######################
 
-
 class DeviceDataPointList(ListAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = DeviceDatapointSerializer
     paginate_by = 100
 
@@ -50,13 +49,13 @@ class DeviceDataPointList(ListAPIView):
                 datapoints = datapoints.filter(timestamp__lte=end_date)
         if not datapoints:
             datapoints = DeviceDataPoints.objects.filter(
-                timestamp__gte=datetime(2023, 1, 1), timestamp__lte=datetime(2023, 1, 2))  # TODO MUDAR PARA HOJE
+                timestamp__gte=datetime(2025, 3, 8, 15, 15), timestamp__lte=datetime(2025, 3, 8, 15, 20))  # TODO MUDAR PARA HOJE
 
         return datapoints.order_by('timestamp')
 
 
 class DeviceDataPointHeatMapSeaborn(APIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         employee_id = self.request.GET.get('employee_id')
@@ -165,7 +164,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
 
 
 class DeviceDataPointAnimation(APIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         employee_id = self.request.GET.get('id')
@@ -212,13 +211,13 @@ class DeviceDataPointAnimation(APIView):
 #############
 
 class DevicesList(generics.ListAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = DeviceSerializer
     queryset = Device.objects.all().order_by('id')
 
 
 class DeviceCreate(generics.CreateAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = DeviceSerializer
 
     def create(self, request, *args, **kwargs):
@@ -233,7 +232,7 @@ class DeviceCreate(generics.CreateAPIView):
 
 
 class DeviceUpdate(generics.UpdateAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = DeviceSerializer
     queryset = Device.objects.all()
     lookup_field = 'id'
@@ -251,7 +250,7 @@ class DeviceUpdate(generics.UpdateAPIView):
 
 
 class DeviceDelete(generics.DestroyAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     queryset = Device.objects.all()
     lookup_field = 'id'
 
@@ -261,7 +260,7 @@ class DeviceDelete(generics.DestroyAPIView):
 ##################
 
 class DeviceTypeList(generics.ListAPIView):
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
     serializer_class = DeviceTypeSerializer
     queryset = DeviceType.objects.all().order_by('name')
 
@@ -278,14 +277,14 @@ class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
     Compatível com o padrão de UI Material para grids e formulários.
     """
     serializer_class = DeviceUserHistorySerializer
-    permission_classes = [AllowAny]  # TODO REMOVER
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return DeviceUserHistory.objects.all().order_by('id')
 
     @action(detail=False, methods=['get'], url_path='employee/(?P<employee_id>\\d+)')
     def by_employee(self, request, employee_id=None):
-        histories = self.queryset.filter(employee_id=employee_id).order_by('-start_date')
+        histories = self.get_queryset().filter(employee_id=employee_id).order_by('-start_date')
         serializer = self.get_serializer(histories, many=True)
         return Response(serializer.data)
     

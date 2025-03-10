@@ -1,38 +1,40 @@
 export const getCSRFToken = () => {
-  const name = 'csrftoken';
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
+    // First try to get token from cookie
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+
+    if (cookieValue) return cookieValue;
+
+    // If not in cookie, try to get from DOM
+    const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfElement ? csrfElement.value : null;
 };
 
 // Create a custom fetch with CSRF token
 const fetchWithCSRF = async (url, options = {}) => {
-  // Ensure headers object exists
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+    const csrfToken = getCSRFToken();
+    
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+    
+    // Ensure headers object exists
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+        ...options.headers,
+    };
 
-  // Add CSRF token for non-GET requests
-  if (options.method && options.method !== 'GET') {
-    headers['X-CSRFToken'] = getCSRFToken();
-  }
+    // Always include credentials
+    const response = await fetch(url, {
+        ...options,
+        credentials: 'include',
+        headers,
+    });
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-
-  return response;
+    return response;
 };
 
 export default fetchWithCSRF;
