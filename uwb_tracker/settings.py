@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
@@ -158,12 +157,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'pt-BR'
-
 USE_I18N = True
-
-TIME_ZONE = 'America/Sao_Paulo'
 USE_TZ = True
+LANGUAGE_CODE = 'pt-BR'
+TIME_ZONE = 'America/Sao_Paulo'
 
 
 # Static files (CSS, JavaScript, Images)

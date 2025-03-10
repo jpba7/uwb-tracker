@@ -50,11 +50,6 @@ const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
     );
   };
 
-  const formatDateTime = (dateString) => {
-    if (!dateString) return '-';
-    return dayjs(dateString).format('DD/MM/YYYY');
-  };
-
   return (
     <Paper
       elevation={2}
@@ -115,8 +110,8 @@ const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
               {histories.map((history) => (
                 <TableRow key={history.id} hover>
                   <TableCell>{history.device_name}</TableCell>
-                  <TableCell>{formatDateTime(history.start_date)}</TableCell>
-                  <TableCell>{formatDateTime(history.end_date)}</TableCell>
+                  <TableCell>{history.start_date}</TableCell>
+                  <TableCell>{history.end_date}</TableCell>
                   <TableCell>
                     <Chip
                       label={history.is_active ? 'Ativo' : 'Inativo'}
