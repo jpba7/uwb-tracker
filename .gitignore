@@ -176,7 +176,9 @@ cython_debug/
 # Static Files
 /static/*
 !/static/favicon.ico
+!/static/images
 /frontend/static-local/*
+!/frontend/static-local/images
 !/frontend/static-local/favicon.ico
 
 # Node Modules
