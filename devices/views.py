@@ -1,3 +1,4 @@
+from django.utils import timezone
 import io
 from datetime import datetime
 
@@ -127,8 +128,8 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         ax.patch.set_alpha(0)
 
         # Carregando e exibindo a imagem de fundo
-        img = mpimg.imread('frontend/dashboard/components/heatmap/planta_baixa.png')  # PNG ou JPG
-        ax.imshow(img, extent=(0, 200, 0, 100))
+        img = mpimg.imread('frontend/dashboard/components/heatmap/planta_labair.png')  # PNG ou JPG
+        ax.imshow(img, extent=(-2, 7, 0, 6))
 
         # Remove as bordas do gráfico
         ax.spines['top'].set_visible(False)
@@ -206,6 +207,61 @@ class DeviceDataPointAnimation(APIView):
         return DeviceDataPoints.objects.get_xy_points_from_history_list(history_list)
 
 
+class DeviceLastPosition(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        employee_id = self.request.GET.get('id')
+        device_id = self.request.GET.get('device_id')
+
+        if employee_id:
+            query = self.get_last_position_for_employee(employee_id)
+        elif device_id:
+            query = self.get_last_position_by_device_id(int(device_id))
+        else:
+            return Response({'error': 'employee_id ou device_id é obrigatório'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not query.exists():
+            return Response({'error': 'Nenhuma posição encontrada'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        # Convertendo queryset para dados
+        data_point = query.values('x', 'y', 'timestamp').first()
+
+        return Response(data_point)
+
+    def get_last_position_by_device_id(self, device_id: int):
+        device = Device.objects.get(id=device_id)
+        return DeviceDataPoints.objects.filter(device=device).order_by('-timestamp')
+
+    def get_last_position_for_employee(self, employee_id: str):
+        employee = Employee.objects.get(id=employee_id)
+        # Primeiro, precisamos descobrir qual dispositivo está atualmente associado ao funcionário
+        current_device = DeviceUserHistory.objects.filter(
+            employee_id=employee_id,
+            is_active=True
+        ).order_by('-start_date').first()
+
+        if current_device:
+            # Se encontramos um dispositivo ativo, retornamos a última posição desse dispositivo
+            return DeviceDataPoints.objects.filter(
+                device=current_device.device
+            ).order_by('-timestamp')
+        else:
+            # Se não encontramos um dispositivo ativo, tentamos buscar o último dispositivo usado
+            last_device = DeviceUserHistory.objects.filter(
+                employee_id=employee_id
+            ).order_by('-end_date').first()
+
+            if last_device:
+                return DeviceDataPoints.objects.filter(
+                    device=last_device.device
+                ).order_by('-timestamp')
+
+            return DeviceDataPoints.objects.none()
+
+
 #############
 ## DEVICES ##
 #############
@@ -269,7 +325,6 @@ class DeviceTypeList(generics.ListAPIView):
 ## DEVICE USER HISTORY ##
 #########################
 
-from django.utils import timezone
 
 class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
     """
@@ -287,26 +342,26 @@ class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
         histories = self.get_queryset().filter(employee_id=employee_id).order_by('-start_date')
         serializer = self.get_serializer(histories, many=True)
         return Response(serializer.data)
-    
+
     # TODO Fazer método de update e create com regras para não sobrepor datas de mesma tag
 
     def perform_update(self, serializer):
         start_date = self.request.data.get('start_date')
         end_date = self.request.data.get('end_date')
-        
+
         data = {
             'device_id': self.request.data.get('device'),
             'employee_id': self.request.data.get('employee'),
             'is_active': self.request.data.get('is_active'),
         }
-        
+
         if start_date:
             naive_dt = parse_datetime(f"{start_date} 00:00:00")
             data['start_date'] = timezone.make_aware(naive_dt)
         if end_date:
             naive_dt = parse_datetime(f"{end_date} 00:00:00")
             data['end_date'] = timezone.make_aware(naive_dt)
-            
+
         serializer.save(**data)
 
 

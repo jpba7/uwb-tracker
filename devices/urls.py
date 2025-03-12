@@ -2,7 +2,7 @@ from django.urls import include, path
 from devices.views import DeviceDataPointList
 from .views import (DeviceDataPointAnimation, DeviceDataPointHeatMapSeaborn,
                     DeviceDelete, DevicesList, DeviceCreate, DeviceUpdate,
-                    DeviceTypeList, DeviceUserHistoryViewSet, BatchPositionCreate)
+                    DeviceTypeList, DeviceUserHistoryViewSet, BatchPositionCreate, DeviceLastPosition)
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -15,6 +15,7 @@ urlpatterns = [
          DeviceDataPointHeatMapSeaborn.as_view(),
          name='device_data_points_heatmap_seaborn'),
     path('datapoints/animation', DeviceDataPointAnimation.as_view(), name='device-animation'),
+    path('datapoints/last-position', DeviceLastPosition.as_view(), name='device-last-position'),
     path('api/ros/datapoints/batch', BatchPositionCreate.as_view(), name='batch_position_create'),
     path('api/list', DevicesList.as_view(), name='devices_list_api'),
     path('api/create', DeviceCreate.as_view(), name='device_create_api'),

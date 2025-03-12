@@ -13,6 +13,9 @@ import Footer from '../../internals/components/Footer';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import ClearIcon from '@mui/icons-material/Clear';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import HistoryIcon from '@mui/icons-material/History';
+import Tooltip from '@mui/material/Tooltip';
 import EmployeeDataCard from './EmployeeDataCard';
 import DeviceHistoryCard from './DeviceHistoryCard';
 import AnimatedTracker from '../../../graphs/AnimatedTracker';
@@ -25,8 +28,11 @@ export default function EmployeeTrackerGrid() {
     start: dayjs().format('YYYY-MM-DD'),
     end: dayjs().add(1, 'day').format('YYYY-MM-DD')
   });
+  // Estado para controlar o modo de visualização (histórico ou tempo real)
+  const [realtimeMode, setRealtimeMode] = React.useState(false);
 
   const handleUpdateTracker = () => {
+    setRealtimeMode(false); // Volta para o modo histórico ao atualizar datas
     setTrackerDates({
       start: tempDate.format('YYYY-MM-DD'),
       end: tempDate.add(1, 'day').format('YYYY-MM-DD')
@@ -40,6 +46,11 @@ export default function EmployeeTrackerGrid() {
       start: today.format('YYYY-MM-DD'),
       end: today.add(1, 'day').format('YYYY-MM-DD')
     });
+    setRealtimeMode(false); // Volta para o modo histórico ao limpar datas
+  };
+
+  const toggleRealTimeMode = () => {
+    setRealtimeMode(prev => !prev);
   };
 
   return (
@@ -60,8 +71,9 @@ export default function EmployeeTrackerGrid() {
               value={tempDate}
               format="DD/MM/YYYY"
               onChange={(newValue) => setTempDate(newValue)}
+              disabled={realtimeMode}
               slotProps={{
-                textField: { size: 'standard'},
+                textField: { size: 'standard' },
                 nextIconButton: { size: 'small' },
                 previousIconButton: { size: 'small' },
               }}
@@ -86,6 +98,7 @@ export default function EmployeeTrackerGrid() {
               <Button 
                 variant="contained" 
                 onClick={handleUpdateTracker}
+                disabled={realtimeMode}
                 sx={{ height: 45, flex: { xs: 1, md: 'none' } }}
               >
                 Atualizar
@@ -96,10 +109,22 @@ export default function EmployeeTrackerGrid() {
                 startIcon={<ClearIcon />}
                 onClick={handleClearDates}
                 sx={{ height: 45, flex: { xs: 1, md: 'none' } }}
-                disabled={!tempDate}
+                disabled={!tempDate || realtimeMode}
               >
                 Limpar
               </Button>
+              
+              <Tooltip title={realtimeMode ? "Mostrar histórico" : "Mostrar tempo real"}>
+                <Button
+                  variant={realtimeMode ? "contained" : "outlined"}
+                  color={realtimeMode ? "success" : "primary"}
+                  startIcon={realtimeMode ? <HistoryIcon /> : <AccessTimeIcon />}
+                  onClick={toggleRealTimeMode}
+                  sx={{ height: 45, flex: { xs: 1, md: 'none' } }}
+                >
+                  {realtimeMode ? "Histórico" : "Tempo Real"}
+                </Button>
+              </Tooltip>
             </Stack>
           </FormControl>
         </LocalizationProvider> 
@@ -109,8 +134,9 @@ export default function EmployeeTrackerGrid() {
         <Grid size={{ xs: 12, lg: 12 }}>
           <AnimatedTracker 
             employee_id={employee_id} 
-            start_date={trackerDates.start} 
-            end_date={trackerDates.end}
+            start_date={realtimeMode ? null : trackerDates.start} 
+            end_date={realtimeMode ? null : trackerDates.end}
+            realtime={realtimeMode}
           />
         </Grid>
 

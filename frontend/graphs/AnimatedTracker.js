@@ -4,20 +4,38 @@ import * as echarts from 'echarts';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 
-const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end_date = null }) => {
+const AnimatedTracker = React.memo(({ 
+  employee_id = null, 
+  start_date = null, 
+  end_date = null,
+  realtime = false
+}) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const [data, setData] = useState(null);
+  const [realtimeData, setRealtimeData] = useState(null);
   const [currentTimeIndex, setCurrentTimeIndex] = useState(0);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
+  const [initialLoading, setInitialLoading] = useState(true); // Novo estado para controlar apenas o carregamento inicial
   const animationRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [animationSpeed, setAnimationSpeed] = useState(500); // ms entre frames (mais lento)
+  const [animationSpeed, setAnimationSpeed] = useState(500);
+  const realtimeIntervalRef = useRef(null);
 
-  // Função para carregar dados
+  // Função para carregar dados históricos
   useEffect(() => {
+    if (realtime) {
+      if (data) {
+        // Se mudar para realtime, mantém os dados históricos carregados
+        setInitialLoading(false);
+        setLoading(false);
+      }
+      return;
+    }
+    
     setLoading(true);
+    setInitialLoading(true);
     const params = new URLSearchParams();
     
     if (employee_id) params.append('id', employee_id);
@@ -44,22 +62,59 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
       })
       .finally(() => {
         setLoading(false);
+        setInitialLoading(false);
       });
-  }, [employee_id, start_date, end_date]);
+  }, [employee_id, start_date, end_date, realtime]);
 
-  // Inicializa o gráfico apenas uma vez quando os dados são carregados
+  // Nova função para polling de dados em tempo real
   useEffect(() => {
-    if (!data || !chartRef.current) return;
-
-    // Limpa qualquer gráfico existente
-    if (chartInstance.current) {
-      chartInstance.current.dispose();
-      chartInstance.current = null;
+    if (!realtime) return;
+    
+    // Se estamos mudando para realtime, apenas fazemos a primeira requisição com loading
+    if (!realtimeData) {
+      setLoading(true);
     }
+    
+    const fetchLastPosition = () => {
+      const params = new URLSearchParams();
+      
+      if (employee_id) params.append('id', employee_id);
 
-    // Certifique-se de que o DOM está pronto e tem dimensões
-    const initChart = () => {
-      if (!chartRef.current) return;
+      fetch(`/devices/datapoints/last-position${params.toString() ? `?${params}` : ''}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao carregar a posição atual.');
+          }
+          return response.json();
+        })
+        .then(responseData => {
+          setRealtimeData(responseData);
+          setError(null);
+          setLoading(false);
+          setInitialLoading(false);
+        })
+        .catch(err => {
+          setError(err.message);
+          setRealtimeData(null);
+          setLoading(false);
+          setInitialLoading(false);
+        });
+    };
+
+    // Executa imediatamente e depois a cada 5 segundos
+    fetchLastPosition();
+    realtimeIntervalRef.current = setInterval(fetchLastPosition, 5000);
+
+    return () => {
+      clearInterval(realtimeIntervalRef.current);
+    };
+  }, [employee_id, realtime]);
+
+  // Inicializa o gráfico apenas uma vez quando os dados ou o chartRef estiverem disponíveis
+  useEffect(() => {
+    // Só inicializa o gráfico quando temos dados (histórico ou realtime) e o ref do elemento
+    if (chartRef.current && !chartInstance.current && 
+        ((data && !realtime) || (realtimeData && realtime))) {
       
       const chart = echarts.init(chartRef.current);
       chartInstance.current = chart;
@@ -77,19 +132,19 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
         xAxis: {
           type: 'value',
           show: false,
-          min: 0,
-          max: 200  // Ajuste conforme as dimensões reais do seu mapa
+          min: -2,
+          max: 7 
         },
         yAxis: {
           type: 'value',
           show: false,
           min: 0,
-          max: 100  // Ajuste conforme as dimensões reais do seu mapa
+          max: 6
         },
         graphic: [{
           type: 'image',
           style: {
-            image: '/static/images/planta_baixa.png',
+            image: '/static/images/planta_labair.png',
           },
           left: 0,
           right: 0,
@@ -99,7 +154,9 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
         }],
         series: [{
           type: 'scatter',
-          data: [[data[currentTimeIndex].x, data[currentTimeIndex].y]],
+          data: realtime 
+            ? [[realtimeData.x, realtimeData.y]] 
+            : [[data[currentTimeIndex].x, data[currentTimeIndex].y]],
           symbolSize: 20,
           itemStyle: {
             color: '#f00',
@@ -119,30 +176,44 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
       
       return () => {
         window.removeEventListener('resize', resizeHandler);
-        chart.dispose();
+        if (chartInstance.current) {
+          chartInstance.current.dispose();
+          chartInstance.current = null;
+        }
       };
-    };
+    }
+  }, [data, realtimeData, currentTimeIndex, realtime]);
 
-    // Usar setTimeout para garantir que o DOM esteja pronto
-    setTimeout(initChart, 100); // Aumentado para 100ms para garantir que o DOM esteja pronto
-  }, [data]);
-
-  // Apenas atualiza os dados do gráfico existente quando currentTimeIndex muda
+  // Atualiza apenas a posição do ponto (separado da inicialização do gráfico)
   useEffect(() => {
-    if (!data || !chartInstance.current) return;
+    if (!chartInstance.current) return; 
+    if (realtime && !realtimeData) return;
+    if (!realtime && (!data || currentTimeIndex >= data.length)) return;
     
-    // Apenas atualiza os dados, sem recriar o gráfico
+    // Apenas atualiza a posição do ponto, não recria o gráfico
     chartInstance.current.setOption({
       series: [{
-        type: 'scatter',
-        data: [[data[currentTimeIndex].x, data[currentTimeIndex].y]]
+        data: realtime 
+          ? [[realtimeData.x, realtimeData.y]] 
+          : [[data[currentTimeIndex].x, data[currentTimeIndex].y]]
       }]
     });
-  }, [data, currentTimeIndex]);
+  }, [data, realtimeData, currentTimeIndex, realtime]);
 
-  // Animação
+  // Quando mudar entre modos, recriamos o gráfico
   useEffect(() => {
-    if (!data || !isPlaying) return;
+    return () => {
+      // Limpeza quando o componente é desmontado ou quando o modo muda
+      if (chartInstance.current) {
+        chartInstance.current.dispose();
+        chartInstance.current = null;
+      }
+    };
+  }, [realtime]); // Depende apenas da mudança de modo
+
+  // Animação para modo histórico
+  useEffect(() => {
+    if (!data || !isPlaying || realtime) return;
 
     const animate = () => {
       setCurrentTimeIndex(prev => {
@@ -161,7 +232,7 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
         clearTimeout(animationRef.current);
       }
     };
-  }, [data, isPlaying, animationSpeed]);
+  }, [data, isPlaying, animationSpeed, realtime]);
 
   const handleSliderChange = (_, value) => {
     if (animationRef.current) {
@@ -183,7 +254,7 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
 
   return (
     <div style={{ 
-      width: '843px', 
+      width: '755px', 
       height: '100%', 
       display: 'flex', 
       flexDirection: 'column',
@@ -191,7 +262,7 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
       borderRadius: '8px',
       overflow: 'visible'
     }}>
-      {loading ? (
+      {initialLoading ? (
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <CircularProgress color="primary" />
         </div>
@@ -206,8 +277,8 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
         </div>
       ) : (
         <>
-          <div ref={chartRef} style={{ flex: 1, minHeight: '565px', minWidth: '843px' }} />
-          {data && (
+          <div ref={chartRef} style={{ flex: 1, minHeight: '576px', minWidth: '755px' }} />
+          {!realtime && data && (
             <Box sx={{ padding: '10px 20px' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2">
@@ -232,6 +303,13 @@ const AnimatedTracker = React.memo(({ employee_id = null, start_date = null, end
                 valueLabelDisplay="auto"
                 valueLabelFormat={value => data ? formatTimestamp(data[value].timestamp) : ''}
               />
+            </Box>
+          )}
+          {realtime && realtimeData && (
+            <Box sx={{ padding: '10px 20px' }}>
+              <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                Última atualização: {formatTimestamp(realtimeData.timestamp)}
+              </Typography>
             </Box>
           )}
         </>
