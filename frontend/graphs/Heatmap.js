@@ -15,7 +15,7 @@ const Heatmap = React.memo(({ employee_id = null, device_id = null, start_date =
     if (start_date) params.append('start_date', start_date);
     if (end_date) params.append('end_date', end_date);
 
-    const url = `/devices/datapoints/heatmap/seaborn${params.toString() ? `?${params}` : ''}`;
+    const url = `/devices/datapoints/heatmap${params.toString() ? `?${params}` : ''}`;
     
     fetch(url)
       .then(response => {

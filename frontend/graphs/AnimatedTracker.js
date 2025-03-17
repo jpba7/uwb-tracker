@@ -42,7 +42,7 @@ const AnimatedTracker = React.memo(({
     if (start_date) params.append('start_date', start_date);
     if (end_date) params.append('end_date', end_date);
 
-    fetch(`/devices/datapoints/animation${params.toString() ? `?${params}` : ''}`)
+    fetch(`/devices/datapoints/tracker${params.toString() ? `?${params}` : ''}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Erro ao carregar os dados de rastreamento.');

@@ -11,11 +11,9 @@ router.register(r'api/device-history', DeviceUserHistoryViewSet, basename='devic
 urlpatterns = [
     path('', include(router.urls)),
     path('datapoints', DeviceDataPointList.as_view(), name='device_data_points'),
-    path('datapoints/heatmap/seaborn',
-         DeviceDataPointHeatMapSeaborn.as_view(),
-         name='device_data_points_heatmap_seaborn'),
-    path('datapoints/animation', DeviceDataPointAnimation.as_view(), name='device-animation'),
+    path('datapoints/heatmap', DeviceDataPointHeatMapSeaborn.as_view(), name='device_data_points_heatmap'),
     path('datapoints/last-position', DeviceLastPosition.as_view(), name='device-last-position'),
+    path('datapoints/tracker', DeviceDataPointAnimation.as_view(), name='device-animation'),
     path('api/ros/datapoints/batch', BatchPositionCreate.as_view(), name='batch_position_create'),
     path('api/list', DevicesList.as_view(), name='devices_list_api'),
     path('api/create', DeviceCreate.as_view(), name='device_create_api'),
