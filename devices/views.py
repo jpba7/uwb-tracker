@@ -128,7 +128,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         ax.patch.set_alpha(0)
 
         # Carregando e exibindo a imagem de fundo
-        img = mpimg.imread('frontend/dashboard/components/heatmap/planta_labair.png')  # PNG ou JPG
+        img = mpimg.imread('frontend/static-local/images/planta_labair.png')  # PNG ou JPG
         ax.imshow(img, extent=(-2, 7, 0, 6))
 
         # Remove as bordas do gráfico
