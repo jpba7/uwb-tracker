@@ -249,7 +249,24 @@ const AnimatedTracker = React.memo(({
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
     const date = new Date(timestamp);
-    return date.toLocaleTimeString();
+    const hoje = new Date();
+    const horas = date.getHours().toString().padStart(2, '0');
+    const minutos = date.getMinutes().toString().padStart(2, '0');
+    const segundos = date.getSeconds().toString().padStart(2, '0');
+    
+    // Verifica se é o mesmo dia
+    const mesmoAno = date.getFullYear() === hoje.getFullYear();
+    const mesmoMes = date.getMonth() === hoje.getMonth();
+    const mesmoDia = date.getDate() === hoje.getDate();
+    
+    if (mesmoAno && mesmoMes && mesmoDia) {
+      return `${horas}:${minutos}:${segundos}`;
+    } else {
+      const dia = date.getDate().toString().padStart(2, '0');
+      const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+      const ano = date.getFullYear();
+      return `${horas}:${minutos}:${segundos} ${dia}/${mes}/${ano}`;
+    }
   };
 
   return (

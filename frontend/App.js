@@ -13,7 +13,7 @@ import EmployeeTrackerGrid from './dashboard/components/employees/EmployeeTracke
 import DeviceHeatmapGrid from './dashboard/components/devices/DeviceHeatmapGrid';
 import DeviceHistoryGrid from './dashboard/components/deviceHistory/DeviceHistoryGrid';
 import { UserProvider } from './contexts/UserContext';
-//import NotFound from './NotFound';
+import NotFound from './dashboard/components/NotFound';
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
           <Route path="/device-histories" element={<Dashboard><DeviceHistoryGrid /></Dashboard>} />
           <Route path="/heatmap" element={<Dashboard><HeatmapGrid /></Dashboard>} />
 
-          <Route path="*" element={<h1>Página não encontrada</h1>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </LocalizationProvider>
     </UserProvider>
