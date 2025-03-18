@@ -19,7 +19,7 @@ const getCSRFToken = () => {
 
 export const deviceService = {
   getAll: async () => {
-    const response = await fetch(`${API_URL}/list`, {
+    const response = await fetch(`${API_URL}/`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export const deviceService = {
   },
 
   create: async (device) => {
-    const response = await fetch(`${API_URL}/create`, {
+    const response = await fetch(`${API_URL}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const deviceService = {
   },
 
   update: async (id, device) => {
-    const response = await fetch(`${API_URL}/update/${id}`, {
+    const response = await fetch(`${API_URL}/${id}/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -69,11 +69,24 @@ export const deviceService = {
   },
 
   delete: async (id) => {
-    await fetch(`${API_URL}/delete/${id}`, {
+    await fetch(`${API_URL}/${id}/`, {
       method: 'DELETE',
       headers: {
         'X-CSRFToken': getCSRFToken(),
       },
     });
+  },
+
+  toggleStatus: async(id) => {
+    const response = await fetch(`${API_URL}/${id}/toggle_status/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Falha ao alterar status do dispositivo');
+    }
+    return response.json();
   }
 };

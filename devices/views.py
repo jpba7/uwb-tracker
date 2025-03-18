@@ -1,33 +1,34 @@
-from django.utils import timezone
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import matplotlib.image as mpimg
 import pandas as pd
 import seaborn as sns
+from django.db.models import Q
 from django.http import HttpResponse
+from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import action
 
 from devices.models import (Device, DeviceDataPoints, DeviceType,
                             DeviceUserHistory)
 from devices.serializers import DeviceDatapointSerializer
 from employees.models import Employee
 
-from .serializers import (DeviceSerializer, DeviceTypeSerializer,
-                          DeviceUserHistorySerializer, BatchPositionSerializer)
-
+from .serializers import (BatchPositionSerializer, DeviceSerializer,
+                          DeviceTypeSerializer, DeviceUserHistorySerializer)
 
 #######################
 ## DEVICE DATAPOINTS ##
 #######################
+
 
 class DeviceDataPointList(ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -53,6 +54,21 @@ class DeviceDataPointList(ListAPIView):
                 timestamp__gte=datetime(2025, 3, 8, 15, 15), timestamp__lte=datetime(2025, 3, 8, 15, 20))  # TODO MUDAR PARA HOJE
 
         return datapoints.order_by('timestamp')
+
+
+class BatchPositionCreate(generics.CreateAPIView):
+    serializer_class = BatchPositionSerializer
+    permission_classes = [AllowAny]  # TODO REMOVER E BOTAR BEARER TOKEN
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            result = serializer.save()
+            return Response({
+                'message': 'Positions created successfullpy',
+                'created': result['created']
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeviceDataPointHeatMapSeaborn(APIView):
@@ -266,15 +282,15 @@ class DeviceLastPosition(APIView):
 ## DEVICES ##
 #############
 
-class DevicesList(generics.ListAPIView):
+class DeviceViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gerenciar dispositivos.
+    Fornece endpoints para CRUD e ações adicionais.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = DeviceSerializer
     queryset = Device.objects.all().order_by('id')
-
-
-class DeviceCreate(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = DeviceSerializer
+    lookup_field = 'id'
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -285,13 +301,6 @@ class DeviceCreate(generics.CreateAPIView):
                 'message': 'Device created successfully'
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class DeviceUpdate(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = DeviceSerializer
-    queryset = Device.objects.all()
-    lookup_field = 'id'
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -304,11 +313,32 @@ class DeviceUpdate(generics.UpdateAPIView):
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['post'])
+    def toggle_status(self, request, id=None):
+        device = self.get_object()
+        device.is_active = not device.is_active
+        device.save()
 
-class DeviceDelete(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Device.objects.all()
-    lookup_field = 'id'
+        if not device.is_active:
+            # Se estiver desativando, desativa também o histórico ativo
+            DeviceUserHistory.objects.filter(
+                device=device,
+                is_active=True
+            ).update(
+                is_active=False,
+                end_date=timezone.now()
+            )
+
+        return Response({
+            'id': device.id,
+            'is_active': device.is_active,
+            'message': f'Dispositivo {"ativado" if device.is_active else "desativado"} com sucesso'
+        })
+
+    @action(detail=False, methods=['get'])
+    def tag_count(self, request):
+        count = self.get_queryset().filter(device_type__name='TAG').count()
+        return Response({'count': count})
 
 
 ##################
@@ -363,18 +393,3 @@ class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
             data['end_date'] = timezone.make_aware(naive_dt)
 
         serializer.save(**data)
-
-
-class BatchPositionCreate(generics.CreateAPIView):
-    serializer_class = BatchPositionSerializer
-    permission_classes = [AllowAny]  # TODO REMOVER E BOTAR BEARER TOKEN
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            result = serializer.save()
-            return Response({
-                'message': 'Positions created successfullpy',
-                'created': result['created']
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

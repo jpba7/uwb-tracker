@@ -4,9 +4,11 @@ import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomizedDataGrid from '../CustomizedDataGrid';
-import { Tooltip } from '@mui/material';
+import { Chip, Tooltip } from '@mui/material';
+import DoNotDisturbOnOutlinedIcon from '@mui/icons-material/DoNotDisturbOnOutlined';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 
-const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
+const createColumns = (handleHeatmap, handleEdit, handleDelete, handleDisable) => [
   { 
     field: 'id',
     headerName: 'ID',
@@ -44,6 +46,20 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
     disableColumnMenu: true
   },
   {
+    field: 'is_active',
+    headerName: 'Status',
+    flex: 1,
+    minWidth: 120,
+    disableColumnMenu: true,
+    renderCell: (params) => (
+      <Chip
+        label={params.value ? 'Ativo' : 'Inativo'}
+        color={params.value ? 'success' : 'default'}
+        size="small"
+      />
+    ),
+  },
+  {
     field: 'heatmap',
     headerName: 'Heatmap',
     headerAlign: 'center',
@@ -52,18 +68,13 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
     sortable: false,
     disableColumnMenu: true,
     renderCell: (params) => (
-      <div>
-        <Tooltip title="Ver heatmap do dispositivo">
-          <span>
-            <IconButton 
-              size="small" 
-              onClick={() => handleHeatmap(params.row)}
-            >
-              <MapOutlinedIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </div>
+      <IconButton
+        size="small"
+        color="error"
+        onClick={() => handleHeatmap(params.row.id)}
+      >
+        <MapOutlinedIcon />
+      </IconButton>
     ),
   },
   {
@@ -78,6 +89,29 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
       <IconButton size="small" onClick={() => handleEdit(params.row)}>
         <EditOutlined />
       </IconButton>
+    ),
+  },
+  {
+    field: 'status_toggle',
+    headerName: 'Mudar Status',
+    headerAlign: 'center',
+    align: 'center',
+    minWidth: 90,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => (
+      <Tooltip title={params.row.is_active ? 'Desativar Dispositivo' : 'Ativar Dispositivo'}>
+        <IconButton 
+          size="small"
+          color={params.row.is_active ? 'warning' : 'success'}
+          onClick={() => handleDisable(params.row.id)}
+        >
+          {params.row.is_active ? 
+            <DoNotDisturbOnOutlinedIcon /> : 
+            <CheckCircleOutlineOutlinedIcon />
+          }
+        </IconButton>
+      </Tooltip>
     ),
   },
   {
@@ -100,14 +134,14 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete) => [
   },
 ];
 
-export default function DeviceTable({rows, handleAdd, handleEdit, handleDelete}) {
+export default function DeviceTable({rows, handleAdd, handleEdit, handleDelete, handleDisable}) {
   const navigate = useNavigate();
 
   const handleHeatmap = (device) => {
     navigate(`/devices/${device.id}/heatmap`);
   };
 
-  const columns = React.useMemo(() => createColumns(handleHeatmap, handleEdit, handleDelete), []);
+  const columns = React.useMemo(() => createColumns(handleHeatmap, handleEdit, handleDelete, handleDisable), []);
 
   return <CustomizedDataGrid
             columns={columns}

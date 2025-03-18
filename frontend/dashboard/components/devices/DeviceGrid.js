@@ -12,9 +12,14 @@ export default function DeviceGrid() {
   const [rows, setRows] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
-  const [confirmDialog, setConfirmDialog] = useState({
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState({
     open: false,
     id: null
+  });
+  const [confirmDisableDialog, setConfirmDisableDialog] = useState({
+    open: false,
+    id: null,
+    isActive: false
   });
 
   const fetchDevices = async () => {
@@ -41,18 +46,35 @@ export default function DeviceGrid() {
   };
 
   const handleDelete = (id) => {
-    setConfirmDialog({
+    setConfirmDeleteDialog({
       open: true,
       id: id
     });
   };
 
+  const handleDisable = (id, isActive) => {
+    setConfirmDisableDialog({
+      open: true,
+      id: id,
+      isActive: isActive
+    });
+  };
+
   const handleConfirmDelete = async () => {
     try {
-      await deviceService.delete(confirmDialog.id);
+      await deviceService.delete(confirmDeleteDialog.id);
       await fetchDevices();
     } catch (error) {
       console.error('Error deleting device:', error);
+    }
+  };
+
+  const handleConfirmDisable = async () => {
+    try {
+      await deviceService.toggleStatus(confirmDisableDialog.id);
+      await fetchDevices();
+    } catch (error) {
+      console.error('Error disabling device:', error);
     }
   };
 
@@ -71,6 +93,7 @@ export default function DeviceGrid() {
             handleAdd={handleAdd}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
+            handleDisable={handleDisable}
           />
         </Grid>
       </Grid>
@@ -83,11 +106,44 @@ export default function DeviceGrid() {
       />
 
       <ConfirmationDialog
-        open={confirmDialog.open}
-        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        open={confirmDeleteDialog.open}
+        onClose={() => setConfirmDeleteDialog({ ...confirmDeleteDialog, open: false })}
         onConfirm={handleConfirmDelete}
         title="Confirmar Exclusão"
         message="Tem certeza que deseja excluir este dispositivo? Todos os pontos e históricos de uso associados a ele serão excluídos."
+        message={
+          <Box>
+            <Typography sx={{ mb: 2 }}>
+              {"Todos os pontos e históricos de uso associados a esse dispositivo serão excluídos também."}
+            </Typography>
+            <Typography>
+              {"Tem certeza que deseja excluir?"}
+            </Typography>
+          </Box>
+        }      
+      />
+
+      <ConfirmationDialog
+        open={confirmDisableDialog.open}
+        onClose={() => setConfirmDisableDialog({ ...confirmDisableDialog, open: false })}
+        onConfirm={handleConfirmDisable}
+        title={!confirmDisableDialog.isActive ? "Confirmar Desativação" : "Confirmar Ativação"}
+        message={
+          <Box>
+            <Typography sx={{ mb: 2 }}>
+              {!confirmDisableDialog.isActive 
+                ? "Os pontos deste dispositivo continuarão no banco de dados, porém todos históricos de uso serão fechados e afetará algumas métricas gerais."
+                : "O dispositivo voltará a aparecer nas métricas gerais mas os históricos de uso dele continuarão fechados."
+              }
+            </Typography>
+            <Typography>
+              {!confirmDisableDialog.isActive 
+                ? "Tem certeza que deseja desativar?"
+                : "Tem certeza que deseja ativar?"
+              }
+            </Typography>
+          </Box>
+        }
       />
       
       <Footer sx={{ my: 4 }} />
