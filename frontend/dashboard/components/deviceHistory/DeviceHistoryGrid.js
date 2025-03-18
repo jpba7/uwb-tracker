@@ -6,11 +6,16 @@ import { deviceHistoryService } from '../../../services/deviceHistoryService';
 import Footer from '../../internals/components/Footer';
 import DeviceHistoryForm from './DeviceHistoryForm';
 import DeviceHistoryTable from './DeviceHistoryTable';
+import ConfirmationDialog from '../ConfirmationDialog';
 
 export default function DeviceHistoryGrid() {
   const [rows, setRows] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [selectedDeviceHistory, setSelectedDeviceHistory] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    id: null
+  });
 
   const fetchDeviceHistories = async () => {
     try {
@@ -35,14 +40,19 @@ export default function DeviceHistoryGrid() {
     setOpenForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este dispositivo?')) {
-      try {
-        await deviceHistoryService.delete(id);
-        fetchDeviceHistories();
-      } catch (error) {
-        console.error('Error deleting device:', error);
-      }
+  const handleDelete = (id) => {
+    setConfirmDialog({
+      open: true,
+      id: id
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deviceHistoryService.delete(confirmDialog.id);
+      fetchDeviceHistories();
+    } catch (error) {
+      console.error('Error deleting device:', error);
     }
   };
 
@@ -50,7 +60,7 @@ export default function DeviceHistoryGrid() {
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography component="h2" variant="h6">
-          Dispositivos
+          Histórico de Uso
         </Typography>
       </Box>
       
@@ -70,6 +80,14 @@ export default function DeviceHistoryGrid() {
         handleClose={() => setOpenForm(false)}
         device={selectedDeviceHistory}
         onSubmit={fetchDeviceHistories}
+      />
+      
+      <ConfirmationDialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este histórico de dispositivo? Esta ação não pode ser desfeita."
       />
       
       <Footer sx={{ my: 4 }} />

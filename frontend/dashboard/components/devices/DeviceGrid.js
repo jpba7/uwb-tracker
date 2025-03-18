@@ -6,11 +6,16 @@ import { deviceService } from '../../../services/deviceService';
 import Footer from '../../internals/components/Footer';
 import DeviceForm from './DeviceForm';
 import DeviceTable from './DeviceTable';
+import ConfirmationDialog from '../ConfirmationDialog';
 
 export default function DeviceGrid() {
   const [rows, setRows] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    id: null
+  });
 
   const fetchDevices = async () => {
     try {
@@ -35,14 +40,19 @@ export default function DeviceGrid() {
     setOpenForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este dispositivo?')) {
-      try {
-        await deviceService.delete(id);
-        fetchDevices();
-      } catch (error) {
-        console.error('Error deleting device:', error);
-      }
+  const handleDelete = (id) => {
+    setConfirmDialog({
+      open: true,
+      id: id
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deviceService.delete(confirmDialog.id);
+      await fetchDevices();
+    } catch (error) {
+      console.error('Error deleting device:', error);
     }
   };
 
@@ -70,6 +80,14 @@ export default function DeviceGrid() {
         handleClose={() => setOpenForm(false)}
         device={selectedDevice}
         onSubmit={fetchDevices}
+      />
+
+      <ConfirmationDialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este dispositivo? Todos os pontos e históricos de uso associados a ele serão excluídos."
       />
       
       <Footer sx={{ my: 4 }} />

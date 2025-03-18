@@ -6,11 +6,16 @@ import { employeeService } from '../../../services/employeeService';
 import Footer from '../../internals/components/Footer';
 import EmployeeForm from './EmployeeForm';
 import EmployeeTable from './EmployeeTable';
+import ConfirmationDialog from '../ConfirmationDialog';
 
 export default function EmployeeGrid() {
   const [rows, setRows] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    id: null
+  });
 
   const fetchEmployees = async () => {
     try {
@@ -35,14 +40,19 @@ export default function EmployeeGrid() {
     setOpenForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este funcionário?')) {
-      try {
-        await employeeService.delete(id);
-        fetchEmployees();
-      } catch (error) {
-        console.error('Error deleting employee:', error);
-      }
+  const handleDelete = (id) => {
+    setConfirmDialog({
+      open: true,
+      id: id
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await employeeService.delete(confirmDialog.id);
+      await fetchEmployees();
+    } catch (error) {
+      console.error('Error deleting device:', error);
     }
   };
 
@@ -72,6 +82,14 @@ export default function EmployeeGrid() {
         onSubmit={fetchEmployees}
       />
       
+      <ConfirmationDialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este funcionário? Os históricos de uso também serão excluídos. Esta ação não pode ser desfeita."
+      />
+
       <Footer sx={{ my: 4 }} />
     </Box>
   );
