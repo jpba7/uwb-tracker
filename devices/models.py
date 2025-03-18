@@ -23,6 +23,7 @@ class Device(models.Model):
     device_type = models.ForeignKey('DeviceType', on_delete=models.CASCADE)
     creation_date = models.DateTimeField(auto_now_add=True)
     linked_employee = models.OneToOneField('employees.Employee', on_delete=models.CASCADE, null=True)
+    is_active = models.BooleanField(default=True)
     objects: DeviceManager = DeviceManager()
 
     def __str__(self):
@@ -36,14 +37,16 @@ class Device(models.Model):
                     if old_instance.linked_employee:
                         DeviceUserHistory.objects.get(device=self, is_active=True).close_history()
                     if self.linked_employee:
-                        DeviceUserHistory.objects.create(device=self, start_date=datetime.now(), employee=self.linked_employee)
+                        DeviceUserHistory.objects.create(
+                            device=self, start_date=datetime.now(), employee=self.linked_employee)
             except Device.DoesNotExist:
                 logging.error('[Device Save] Device not found, unexpected behaviour.')
                 pass
             except DeviceUserHistory.DoesNotExist:
                 logging.error('[Device Save] Previous DeviceUserHistory not found, creating new one.')
                 if self.linked_employee:
-                    DeviceUserHistory.objects.create(device=self, start_date=datetime.now(), employee=self.linked_employee)
+                    DeviceUserHistory.objects.create(
+                        device=self, start_date=datetime.now(), employee=self.linked_employee)
         else:
             if self.linked_employee:
                 DeviceUserHistory.objects.create(device=self, start_date=datetime.now(), employee=self.linked_employee)

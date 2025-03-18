@@ -16,6 +16,7 @@ class DeviceSerializer(serializers.ModelSerializer):
             'device_type',
             'device_type_name',
             'creation_date',
+            'is_active',
             'linked_employee',
             'linked_employee_name']
 
@@ -52,21 +53,22 @@ class DeviceUserHistorySerializer(serializers.ModelSerializer):
 
     def get_device_name(self, obj):
         return obj.device.name if obj.device else None
-    
+
     def get_employee_full_name(self, obj: DeviceUserHistory) -> str:
         if obj.employee:
             return f'{obj.employee.first_name} {obj.employee.last_name}'.strip()
         return ''
-    
+
     def get_formatted_start_date(self, obj: DeviceUserHistory) -> str:
         if obj.start_date:
             return obj.start_date.strftime('%d/%m/%Y')
         return ''
-    
+
     def get_formatted_end_date(self, obj: DeviceUserHistory) -> str:
         if obj.end_date:
             return obj.end_date.strftime('%d/%m/%Y')
         return ''
+
 
 class PositionSerializer(serializers.Serializer):
     tag_id = serializers.CharField()
