@@ -88,5 +88,34 @@ export const deviceService = {
       throw new Error('Falha ao alterar status do dispositivo');
     }
     return response.json();
-  }
+  },
+
+  getActiveDevicesCount: async () => {
+    const response = await fetch(`${API_URL}/?is_active=true`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Falha ao buscar contagem de dispositivos ativos');
+    }
+    const data = await response.json();
+    return data.length;
+  },
+
+  getActiveHistory: async () => {
+    const response = await fetch(`${API_URL}/active_history/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Falha ao buscar histórico de tags ativas');
+    }
+    return response.json();
+  },
 };

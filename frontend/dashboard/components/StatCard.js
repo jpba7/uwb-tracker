@@ -10,19 +10,17 @@ import Typography from '@mui/material/Typography';
 import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
 import { areaElementClasses } from '@mui/x-charts/LineChart';
 
-function getDaysInMonth(month, year) {
-  const date = new Date(year, month, 0);
-  const monthName = date.toLocaleDateString('en-US', {
-    month: 'short',
-  });
-  const daysInMonth = date.getDate();
-  const days = [];
-  let i = 1;
-  while (days.length < daysInMonth) {
-    days.push(`${monthName} ${i}`);
-    i += 1;
+function getDaysInMonth(numberOfDays) {
+  const dates = [];
+  const today = new Date();
+  
+  for (let i = numberOfDays - 1; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    dates.push(date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
   }
-  return days;
+  
+  return dates;
 }
 
 function AreaGradient({ color, id }) {
@@ -43,7 +41,8 @@ AreaGradient.propTypes = {
 
 function StatCard({ title, value, interval, trend, data }) {
   const theme = useTheme();
-  const daysInWeek = getDaysInMonth(4, 2024);
+  const numberOfDays = data.length;
+  const daysInPeriod = getDaysInMonth(numberOfDays);
 
   const trendColors = {
     up:
@@ -60,15 +59,9 @@ function StatCard({ title, value, interval, trend, data }) {
         : theme.palette.grey[700],
   };
 
-  const labelColors = {
-    up: 'success',
-    down: 'error',
-    neutral: 'default',
-  };
 
-  const color = labelColors[trend];
+
   const chartColor = trendColors[trend];
-  const trendValues = { up: '+25%', down: '-25%', neutral: '+5%' };
 
   return (
     <Card variant="outlined" sx={{ height: '100%', flexGrow: 1 }}>
@@ -88,7 +81,6 @@ function StatCard({ title, value, interval, trend, data }) {
               <Typography variant="h4" component="p">
                 {value}
               </Typography>
-              <Chip size="small" color={color} label={trendValues[trend]} />
             </Stack>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {interval}
@@ -103,7 +95,7 @@ function StatCard({ title, value, interval, trend, data }) {
               showTooltip
               xAxis={{
                 scaleType: 'band',
-                data: daysInWeek, // Use the correct property 'data' for xAxis
+                data: daysInPeriod,
               }}
               sx={{
                 [`& .${areaElementClasses.root}`]: {

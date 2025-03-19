@@ -106,5 +106,19 @@ export const deviceHistoryService = {
         }
 
         return true;
+    },
+
+    getActiveHistory: async () => {
+        const response = await fetch(`${API_URL}/active-history/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Falha ao buscar histórico ativo');
+        }
+        return response.json();
     }
 };

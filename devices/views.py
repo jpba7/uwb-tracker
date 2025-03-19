@@ -145,7 +145,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
 
         # Carregando e exibindo a imagem de fundo
         img = mpimg.imread('frontend/static-local/images/planta_labair.png')  # PNG ou JPG
-        ax.imshow(img, extent=(-2, 7, 0, 6))
+        ax.imshow(img, extent=(0, 200, 0, 100))
 
         # Remove as bordas do gráfico
         ax.spines['top'].set_visible(False)
@@ -340,6 +340,30 @@ class DeviceViewSet(viewsets.ModelViewSet):
         count = self.get_queryset().filter(device_type__name='TAG').count()
         return Response({'count': count})
 
+    @action(detail=False, methods=['get'])
+    def active_history(self, request):
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=31)
+
+        daily_counts = []
+
+        for day in range(31):  # 0 a 30 dias
+            current_date = start_date + timedelta(days=day)
+            next_date = current_date + timedelta(days=1)
+
+            # Conta tags criadas até aquela data
+            count = self.get_queryset().filter(
+                device_type__name='Tag',
+                creation_date__lte=next_date
+            ).count()
+
+            daily_counts.append({
+                'date': current_date.strftime('%Y-%m-%d'),
+                'active_tags': count
+            })
+
+        return Response(daily_counts)
+
 
 ##################
 ## DEVICE TYPES ##
@@ -376,7 +400,7 @@ class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='active-history')
     def active_history(self, request):
         end_date = timezone.now()
-        start_date = end_date - timedelta(days=30)
+        start_date = end_date - timedelta(days=31)
 
         daily_counts = []
 
