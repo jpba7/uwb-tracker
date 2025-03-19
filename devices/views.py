@@ -373,6 +373,27 @@ class DeviceUserHistoryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(histories, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='active-history')
+    def active_history(self, request):
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=30)
+
+        daily_counts = []
+
+        for day in range(31):  # 0 a 30 dias
+            current_date = start_date + timedelta(days=day)
+
+            # Conta usuários ativos naquele dia
+            count = self.get_queryset().filter(start_date__lte=current_date).filter(
+                Q(end_date__isnull=True) | Q(end_date__gte=current_date)).count()
+
+            daily_counts.append({
+                'date': current_date.strftime('%Y-%m-%d'),
+                'active_users': count
+            })
+
+        return Response(daily_counts)
+
     # TODO Fazer método de update e create com regras para não sobrepor datas de mesma tag
 
     def perform_update(self, serializer):
