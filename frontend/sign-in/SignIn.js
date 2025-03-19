@@ -119,7 +119,7 @@ export default function SignIn(props) {
         });
         
         await authService.login(username, password);
-        window.location.href = '/index';
+        window.location.href = '/';
     } catch (error) {
         console.error('Login error:', error);
         setUsernameError(true);

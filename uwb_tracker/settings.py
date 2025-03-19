@@ -193,5 +193,5 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # Redirect
-LOGIN_REDIRECT_URL = '/index'
-LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login'

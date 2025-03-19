@@ -30,12 +30,12 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
-    login_url = '/'
+    login_url = '/login'
 
 
 urlpatterns = [
-    path('', auth_views.LoginView.as_view(), name='my_login'),
-    path('index', IndexView.as_view(), name='index'),
+    path('login', auth_views.LoginView.as_view(), name='my_login'),
+    path('', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('django/accounts/', include('django.contrib.auth.urls')),
     re_path(r'^favicon\.ico$', favicon_view),

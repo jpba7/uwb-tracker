@@ -35,7 +35,7 @@ const NotFound = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => navigate('/index')}
+          onClick={() => navigate('/')}
           sx={{ mt: 2 }}
         >
           Voltar para a página inicial

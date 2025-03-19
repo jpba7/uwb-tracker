@@ -36,7 +36,7 @@ export default function NavbarBreadcrumbs() {
     
     const breadcrumbs = [{
       name: 'UWB Tracker',
-      path: '/index'
+      path: '/'
     }];
 
     pathnames.forEach((value, index) => {

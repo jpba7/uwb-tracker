@@ -16,7 +16,7 @@ import { TapAndPlayOutlined } from '@mui/icons-material';
 import HistoryIcon from '@mui/icons-material/History';
 
 const mainListItems = [
-  { text: 'Início', icon: <HomeRoundedIcon />, link: '/index'},
+  { text: 'Início', icon: <HomeRoundedIcon />, link: '/'},
   { text: 'Funcionários', icon: <PeopleRoundedIcon />, link: '/employees'},
   { text: 'Dispositivos', icon: <TapAndPlayOutlined />, link: '/devices'},
   { text: 'Histórico de Uso', icon: <HistoryIcon />, link: '/device-histories'},

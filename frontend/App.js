@@ -21,7 +21,7 @@ function App() {
     <UserProvider>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
         <Routes>
-          <Route path="/index" element={<Dashboard><MainGrid /></Dashboard>} />
+          <Route path="/" element={<Dashboard><MainGrid /></Dashboard>} />
           <Route path="/employees" element={<Dashboard><EmployeeGrid /></Dashboard>} />
           <Route path="/employees/:employee_id/heatmap" element={<Dashboard><EmployeeHeatmapGrid /></Dashboard>} />
           <Route path="/employees/:employee_id/tracker" element={<Dashboard><EmployeeTrackerGrid /></Dashboard>} />
