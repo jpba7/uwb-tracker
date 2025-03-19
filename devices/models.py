@@ -41,20 +41,41 @@ class Device(models.Model):
                     if old_instance.linked_employee:
                         DeviceUserHistory.objects.get(device=self, is_active=True).close_history()
                     if self.linked_employee:
+                        # Primeiro salvamos o Device
+                        super().save(*args, **kwargs)
+                        # Depois criamos o histórico
                         DeviceUserHistory.objects.create(
-                            device=self, start_date=datetime.now().replace(hour=0, minute=0, second=1), employee=self.linked_employee)
+                            device=self, 
+                            start_date=datetime.now().replace(hour=0, minute=0, second=1), 
+                            employee=self.linked_employee
+                        )
+                        return  # Retornamos aqui pois já salvamos
             except Device.DoesNotExist:
                 logging.error('[Device Save] Device not found, unexpected behaviour.')
-                pass
             except DeviceUserHistory.DoesNotExist:
                 logging.error('[Device Save] Previous DeviceUserHistory not found, creating new one.')
                 if self.linked_employee:
+                    # Primeiro salvamos o Device
+                    super().save(*args, **kwargs)
+                    # Depois criamos o histórico
                     DeviceUserHistory.objects.create(
-                        device=self, start_date=datetime.now().replace(hour=0, minute=0, second=1), employee=self.linked_employee)
-        else:
-            if self.linked_employee:
-                DeviceUserHistory.objects.create(device=self, start_date=datetime.now().replace(hour=0, minute=0, second=1), employee=self.linked_employee)
+                        device=self, 
+                        start_date=datetime.now().replace(hour=0, minute=0, second=1), 
+                        employee=self.linked_employee
+                    )
+                    return  # Retornamos aqui pois já salvamos
+        elif self.linked_employee:  # Novo objeto com linked_employee
+            # Primeiro salvamos o Device
+            super().save(*args, **kwargs)
+            # Depois criamos o histórico
+            DeviceUserHistory.objects.create(
+                device=self, 
+                start_date=datetime.now().replace(hour=0, minute=0, second=1), 
+                employee=self.linked_employee
+            )
+            return  # Retornamos aqui pois já salvamos
 
+        # Se chegou aqui, salvamos normalmente
         super().save(*args, **kwargs)
 
 
