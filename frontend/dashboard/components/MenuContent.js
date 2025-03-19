@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import { TapAndPlayOutlined } from '@mui/icons-material';
 import HistoryIcon from '@mui/icons-material/History';
+import { useUser } from '../../contexts/UserContext';
 
 const mainListItems = [
   { text: 'Início', icon: <HomeRoundedIcon />, link: '/'},
@@ -24,12 +25,16 @@ const mainListItems = [
 ];
 
 const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRoundedIcon />},
-  { text: 'About', icon: <InfoRoundedIcon /> },
-  { text: 'Feedback', icon: <HelpRoundedIcon /> },
+  { 
+    text: 'Painel do Administrador', 
+    icon: <SettingsRoundedIcon />, 
+    link: '/admin/'
+  },
 ];
 
 export default function MenuContent() {
+  const { user } = useUser();
+
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
       <List dense>
@@ -43,9 +48,11 @@ export default function MenuContent() {
         ))}
       </List>
       <List dense>
-        {secondaryListItems.map((item, index) => (
+        {user?.is_staff && secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton>
+            <ListItemButton 
+              onClick={() => window.location.href = item.link}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

@@ -19,12 +19,16 @@ class DeviceManager(models.Manager):
 
 
 class Device(models.Model):
-    name = models.CharField(max_length=100)
-    device_type = models.ForeignKey('DeviceType', on_delete=models.CASCADE)
-    creation_date = models.DateTimeField(auto_now_add=True)
-    linked_employee = models.OneToOneField('employees.Employee', on_delete=models.CASCADE, null=True)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=100, verbose_name='Nome do Dispositivo')
+    device_type = models.ForeignKey('DeviceType', on_delete=models.CASCADE, verbose_name='Tipo de Dispositivo')
+    creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')
+    linked_employee = models.OneToOneField('employees.Employee', on_delete=models.CASCADE, null=True, verbose_name='Funcionário Vinculado')
+    is_active = models.BooleanField(default=True, verbose_name='Ativo')
     objects: DeviceManager = DeviceManager()
+
+    class Meta:
+        verbose_name = 'Dispositivo'
+        verbose_name_plural = 'Dispositivos'
 
     def __str__(self):
         return f'{self.device_type.name}: {self.name}'
@@ -38,7 +42,7 @@ class Device(models.Model):
                         DeviceUserHistory.objects.get(device=self, is_active=True).close_history()
                     if self.linked_employee:
                         DeviceUserHistory.objects.create(
-                            device=self, start_date=datetime.now(), employee=self.linked_employee)
+                            device=self, start_date=datetime.now().replace(hour=0, minute=0, second=1), employee=self.linked_employee)
             except Device.DoesNotExist:
                 logging.error('[Device Save] Device not found, unexpected behaviour.')
                 pass
@@ -46,20 +50,20 @@ class Device(models.Model):
                 logging.error('[Device Save] Previous DeviceUserHistory not found, creating new one.')
                 if self.linked_employee:
                     DeviceUserHistory.objects.create(
-                        device=self, start_date=datetime.now(), employee=self.linked_employee)
+                        device=self, start_date=datetime.now().replace(hour=0, minute=0, second=1), employee=self.linked_employee)
         else:
             if self.linked_employee:
-                DeviceUserHistory.objects.create(device=self, start_date=datetime.now(), employee=self.linked_employee)
+                DeviceUserHistory.objects.create(device=self, start_date=datetime.now().replace(hour=0, minute=0, second=1), employee=self.linked_employee)
 
         super().save(*args, **kwargs)
 
 
 class DeviceType(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='Tipo de Dispositivo')
 
     class Meta:
-        verbose_name = 'Device Type'
-        verbose_name_plural = 'Device Types'
+        verbose_name = 'Tipo de Dispositivo'
+        verbose_name_plural = 'Tipos de Dispositivos'
 
     def __str__(self):
         return str(self.name)
@@ -90,16 +94,16 @@ class DeviceDataPointManager(models.Manager):
 
 
 class DeviceDataPoints(models.Model):
-    device = models.ForeignKey('Device', on_delete=models.CASCADE)
+    device = models.ForeignKey('Device', on_delete=models.CASCADE, verbose_name='Dispositivo')
     x = models.DecimalField(max_digits=10, decimal_places=2)
     y = models.DecimalField(max_digits=10, decimal_places=2)
     z = models.DecimalField(max_digits=10, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Data de Registro')
     objects: DeviceDataPointManager = DeviceDataPointManager()
 
     class Meta:
-        verbose_name = 'Device Data Point'
-        verbose_name_plural = 'Device Data Points'
+        verbose_name = 'Coordenadas do Dispositivo'
+        verbose_name_plural = 'Coordenadas dos Dispositivos'
 
     def __str__(self) -> str:
         return f'{self.device.name} ({self.timestamp}): {self.x}, {self.y}, {self.z}'
@@ -116,16 +120,20 @@ class DeviceUserHistoryManager(models.Manager):
 
 
 class DeviceUserHistory(models.Model):
-    device = models.ForeignKey('Device', on_delete=models.CASCADE)
-    employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True)
-    is_active = models.BooleanField(default=True)
+    device = models.ForeignKey('Device', on_delete=models.CASCADE, verbose_name='Dispositivo')
+    employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE, verbose_name='Funcionário')
+    start_date = models.DateTimeField(verbose_name='Data de Início')
+    end_date = models.DateTimeField(null=True, verbose_name='Data de Fim')
+    is_active = models.BooleanField(default=True, verbose_name='Ativo')
     objects: DeviceUserHistoryManager = DeviceUserHistoryManager()
 
+    def __str__(self) -> str:
+        formatted_date = self.start_date.strftime('%d/%m/%Y')
+        return f'{self.device.name} - {self.employee} ({formatted_date})'
+
     class Meta:
-        verbose_name = 'Device User History'
-        verbose_name_plural = 'Device User Histories'
+        verbose_name = 'Histórico de Uso do Dispositivo'
+        verbose_name_plural = 'Históricos de Uso dos Dispositivos'
 
     def close_history(self):
         self.end_date = datetime.now()

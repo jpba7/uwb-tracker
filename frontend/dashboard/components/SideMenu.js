@@ -71,16 +71,16 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt={user?.name || 'User'}
+          alt={user?.first_name || 'User'}
           src={user?.avatar || "/static/images/avatar/default.jpg"}
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            {loading ? 'Loading...' : (user?.name || 'User')}
+            {loading ? 'Loading...' : (user ? `${user.first_name} ${user.last_name}` : 'User')}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {loading ? 'Loading...' : (user?.email || '')}
+            {loading ? 'Loading...' : (user?.username || '')}
           </Typography>
         </Box>
         <IconButton
