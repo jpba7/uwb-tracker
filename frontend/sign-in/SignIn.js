@@ -84,7 +84,7 @@ export default function SignIn(props) {
 
     if (!username.value || username < 3) {
       setUsernameError(true);
-      setUsernameErrorMessage('Please enter a valid login.');
+      setUsernameErrorMessage('Entre um login válido com no mínimo 3 caracteres.');
       isValid = false;
     } else {
       setUsernameError(false);
@@ -93,7 +93,7 @@ export default function SignIn(props) {
 
     if (!password.value || password.value.length < 3) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('A senha deve conter no mínimo 3 caracteres.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -183,7 +183,6 @@ export default function SignIn(props) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
                 required
                 fullWidth
                 variant="outlined"
