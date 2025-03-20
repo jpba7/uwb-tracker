@@ -133,13 +133,13 @@ const AnimatedTracker = React.memo(({
           type: 'value',
           show: false,
           min: -2,
-          max: 7 
+          max: 6.3 
         },
         yAxis: {
           type: 'value',
           show: false,
           min: 0,
-          max: 6
+          max: 6.7
         },
         graphic: [{
           type: 'image',

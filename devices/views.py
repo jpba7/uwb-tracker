@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 import matplotlib.image as mpimg
 import pandas as pd
+import numpy as np
 import seaborn as sns
 from django.db.models import Q
 from django.http import HttpResponse
@@ -137,11 +138,11 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         # Dimensões em polegadas para 755x576 pixels em 100 DPI
         width_inches = 7.55
         height_inches = 5.76
-        
+
         # Criando figura com dimensões específicas
         fig = Figure(figsize=(width_inches, height_inches))
         fig.patch.set_alpha(0)
-        
+
         # Criando subplot sem margens
         ax = fig.add_subplot(111)
         ax.set_position([0, 0, 1, 1])
@@ -149,7 +150,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
 
         # Carregando e exibindo a imagem de fundo
         img = mpimg.imread('frontend/static-local/images/planta_labair.png')
-        ax.imshow(img, extent=(0, 200, 0, 100), aspect='auto')
+        ax.imshow(img, extent=(-2.8, 6, -0.1, 6.4), aspect='auto')
 
         # Remove bordas
         for spine in ax.spines.values():
@@ -159,24 +160,37 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         ax.set_xticks([])
         ax.set_yticks([])
 
-        # Gerando o heatmap
-        sns.kdeplot(
-            data=df_sampled,
-            x='x',
-            y='y',
-            fill=True,
-            thresh=0.001,
-            levels=100,
-            bw_adjust=0.5,
-            gridsize=100,
-            cmap='Spectral_r',
-            alpha=0.6,
-            ax=ax
-        )
+        try:
+            # Gerando o heatmap com níveis explícitos e crescentes
+            sns.kdeplot(
+                data=df_sampled,
+                x='x',
+                y='y',
+                fill=True,
+                thresh=0.001,
+                levels=50,  # Níveis crescentes de 0 a 1
+                bw_adjust=0.5,
+                gridsize=100,
+                cmap='Spectral_r',
+                alpha=0.6,
+                ax=ax
+            )
+        except ValueError:
+            # Fallback para um heatmap mais simples se houver erro
+            sns.kdeplot(
+                data=df_sampled,
+                x='x',
+                y='y',
+                fill=True,
+                bw_adjust=0.5,
+                cmap='Spectral_r',
+                alpha=0.6,
+                ax=ax
+            )
 
         # Configurando limites
-        ax.set_xlim(0, 200)
-        ax.set_ylim(0, 100)
+        ax.set_xlim(-2.8, 6)
+        ax.set_ylim(-0.1, 6.4)
 
         # Removendo margens
         fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
@@ -184,17 +198,17 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         # Salvando a figura
         buf = io.BytesIO()
         canvas = FigureCanvasAgg(fig)
-        
+
         # Usando savefig ao invés de print_png para controlar o DPI
         fig.savefig(
-            buf, 
+            buf,
             format='png',
             dpi=100,
             bbox_inches='tight',
             pad_inches=0,
             transparent=True
         )
-        
+
         buf.seek(0)
         return buf.getvalue()
 
@@ -296,24 +310,24 @@ class DeviceLastPosition(APIView):
 
             return DeviceDataPoints.objects.none()
 
-class DeviceLastPositionToday(APIView):
-    permission_classes = [IsAuthenticated]  
-    
-    def get(self, request):
-        today = timezone.now().date()
-        today_start = timezone.make_aware(datetime.combine(today, datetime.min.time()))
-        today_end = timezone.make_aware(datetime.combine(today, datetime.max.time()))
 
-        # Pega todos os devices que têm datapoints hoje
+class DeviceLastPositionToday(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Pega o timestamp de 30 minutos atrás
+        thirty_mins_ago = timezone.now() - timedelta(minutes=30)
+
+        # Pega todos os devices que têm datapoints nos últimos 30 minutos
         devices_with_data = Device.objects.filter(
-            devicedatapoints__timestamp__range=(today_start, today_end)
+            devicedatapoints__timestamp__gte=thirty_mins_ago
         ).distinct()
 
         all_positions = []
         for device in devices_with_data:
             last_position = DeviceDataPoints.objects.filter(
                 device=device,
-                timestamp__range=(today_start, today_end)
+                timestamp__gte=thirty_mins_ago
             ).order_by('-timestamp').first()
 
             if last_position:
@@ -323,7 +337,7 @@ class DeviceLastPositionToday(APIView):
                     'linked_employee': str(device.linked_employee),
                     'x': last_position.x,
                     'y': last_position.y,
-                    'timestamp': last_position.timestamp
+                    'timestamp': last_position.timestamp.strftime('%H:%M:%S %d/%m/%Y')
                 })
 
         return Response(all_positions)

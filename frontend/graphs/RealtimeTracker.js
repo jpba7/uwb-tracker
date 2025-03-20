@@ -46,7 +46,7 @@ const RealtimeTracker = React.memo(() => {
 
     // Executa imediatamente e depois a cada 5 segundos
     fetchAllPositions();
-    realtimeIntervalRef.current = setInterval(fetchAllPositions, 5000);
+    realtimeIntervalRef.current = setInterval(fetchAllPositions, 1000);
 
     return () => {
       clearInterval(realtimeIntervalRef.current);
@@ -69,7 +69,8 @@ const RealtimeTracker = React.memo(() => {
           formatter: function(params) {
             const device = data[params.dataIndex];
             return `<strong>Funcionário:</strong> ${(device.linked_employee === 'None'? 'Sem funcionário associado' : device.linked_employee) || 'N/A'}<br/>
-                    <strong>Dispositivo:</strong> ${device.device_name || 'N/A'}`;
+                    <strong>Dispositivo:</strong> ${device.device_name || 'N/A'}<br/>
+                    <strong>Ultima medição:</strong> ${device.timestamp}`;
           }
         },
         grid: {
@@ -82,14 +83,14 @@ const RealtimeTracker = React.memo(() => {
         xAxis: {
           type: 'value',
           show: false,
-          min: 0,
-          max: 200 
+          min: -2.0,
+          max: 6.3
         },
         yAxis: {
           type: 'value',
           show: false,
           min: 0,
-          max: 100
+          max: 6.7
         },
         graphic: [{
           type: 'image',
@@ -194,7 +195,7 @@ const RealtimeTracker = React.memo(() => {
           {data && data.length > 0 && (
             <Box sx={{ padding: '10px 20px' }}>
               <Typography variant="body2" sx={{ textAlign: 'center' }}>
-                Última atualização: {formatTimestamp(data[0]?.timestamp)}
+                Última atualização: {data[0].timestamp}
               </Typography>
             </Box>
           )}

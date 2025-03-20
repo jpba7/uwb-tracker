@@ -15,8 +15,8 @@ import RealtimeTracker from '../../graphs/RealtimeTracker';
 export default function MainGrid() {
   const [activeHistory, setActiveHistory] = React.useState([]);
   const [tagHistory, setTagHistory] = React.useState([]);
-  const defaultEndDate = dayjs();
-  const defaultStartDate = dayjs().subtract(30, 'days');
+  const defaultEndDate = dayjs().add(1, 'days');
+  const defaultStartDate = dayjs().subtract(30, 'minutes');
   const [heatmapDates, setHeatmapDates] = React.useState({
     start: defaultStartDate.format('YYYY-MM-DD'),
     end: defaultEndDate.format('YYYY-MM-DD')
@@ -107,7 +107,7 @@ export default function MainGrid() {
           <Card variant="outlined" sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Rastreamento em Tempo Real
+                Rastreamento em Tempo Real - Últimos 30 minutos
               </Typography>
               <RealtimeTracker />
             </CardContent>
