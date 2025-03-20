@@ -96,7 +96,7 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete, handleDisable) =
     headerName: 'Mudar Status',
     headerAlign: 'center',
     align: 'center',
-    minWidth: 90,
+    minWidth: 110,
     sortable: false,
     disableColumnMenu: true,
     renderCell: (params) => (

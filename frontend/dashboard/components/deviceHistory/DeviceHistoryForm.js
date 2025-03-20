@@ -100,7 +100,7 @@ export default function DeviceHistoryForm({ open, handleClose, device: deviceHis
         const device = deviceData.find(dev => dev.id === deviceId);
         return device;
       } catch (error) {
-        console.error('Erro ao carregar dispositivo:', error);
+        console.error('Erro ao carregar histórico de uso:', error);
         return null;
       }
     };
@@ -218,7 +218,7 @@ export default function DeviceHistoryForm({ open, handleClose, device: deviceHis
       fullWidth
     >
       <DialogTitle>
-        {deviceHistory ? 'Editar Dispositivo' : 'Novo Dispositivo'}
+        {deviceHistory ? 'Editar Histórico' : 'Novo Histórico'}
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
