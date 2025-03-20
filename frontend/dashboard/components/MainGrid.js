@@ -10,6 +10,7 @@ import { deviceHistoryService } from '../../services/deviceHistoryService';
 import { deviceService } from '../../services/deviceService';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import RealtimeTracker from '../../graphs/RealtimeTracker';
 
 export default function MainGrid() {
   const [activeHistory, setActiveHistory] = React.useState([]);
@@ -95,12 +96,26 @@ export default function MainGrid() {
         </Grid>
       </Grid>
 
-      {/* Grid separado para o Heatmap */}
+      {/* Grid para o Rastreamento em Tempo Real e Heatmap */}
       <Grid 
         container 
+        spacing={2}
         sx={{ mt: 2 }}
       >
-        <Grid size={6}>
+        {/* Rastreamento em Tempo Real */}
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <Card variant="outlined" sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Rastreamento em Tempo Real
+              </Typography>
+              <RealtimeTracker />
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        {/* Heatmap */}
+        <Grid size={{ xs: 12, lg: 6 }}>
           <Card variant="outlined" sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
@@ -114,6 +129,7 @@ export default function MainGrid() {
           </Card>
         </Grid>
       </Grid>
+      
       <Footer sx={{ my: 4 }} />
     </Box>
   );

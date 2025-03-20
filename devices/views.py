@@ -131,29 +131,35 @@ class DeviceDataPointHeatMapSeaborn(APIView):
         return xy_points
 
     def create_heatmap_image(self, data: pd.DataFrame, max_sampling: int = 10000) -> bytes:
-        # Amostragem aleatória - ajuste o frac conforme necessário (ex: 0.1 = 10% dos dados)
+        # Amostragem aleatória
         df_sampled = data.sample(n=min(max_sampling, len(data)), random_state=42)
 
-        # Criando figura do matplotlib
-        fig = Figure(figsize=(12, 6))
+        # Dimensões em polegadas para 755x576 pixels em 100 DPI
+        width_inches = 7.55
+        height_inches = 5.76
+        
+        # Criando figura com dimensões específicas
+        fig = Figure(figsize=(width_inches, height_inches))
         fig.patch.set_alpha(0)
-        fig.tight_layout(pad=0)
-
+        
+        # Criando subplot sem margens
         ax = fig.add_subplot(111)
-        ax.set_position((0, 0, 1, 1))
+        ax.set_position([0, 0, 1, 1])
         ax.patch.set_alpha(0)
 
         # Carregando e exibindo a imagem de fundo
-        img = mpimg.imread('frontend/static-local/images/planta_labair.png')  # PNG ou JPG
-        ax.imshow(img, extent=(0, 200, 0, 100))
+        img = mpimg.imread('frontend/static-local/images/planta_labair.png')
+        ax.imshow(img, extent=(0, 200, 0, 100), aspect='auto')
 
-        # Remove as bordas do gráfico
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.spines['left'].set_visible(False)
+        # Remove bordas
+        for spine in ax.spines.values():
+            spine.set_visible(False)
 
-        # Gerando o heatmap com parâmetros otimizados
+        # Remove ticks e labels
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        # Gerando o heatmap
         sns.kdeplot(
             data=df_sampled,
             x='x',
@@ -168,15 +174,28 @@ class DeviceDataPointHeatMapSeaborn(APIView):
             ax=ax
         )
 
-        # Configurando os limites do plot para combinar com a imagem
+        # Configurando limites
         ax.set_xlim(0, 200)
         ax.set_ylim(0, 100)
 
-        # Salvando a figura em um buffer
+        # Removendo margens
+        fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+
+        # Salvando a figura
         buf = io.BytesIO()
         canvas = FigureCanvasAgg(fig)
-        canvas.print_png(buf)
-
+        
+        # Usando savefig ao invés de print_png para controlar o DPI
+        fig.savefig(
+            buf, 
+            format='png',
+            dpi=100,
+            bbox_inches='tight',
+            pad_inches=0,
+            transparent=True
+        )
+        
+        buf.seek(0)
         return buf.getvalue()
 
 
@@ -276,6 +295,38 @@ class DeviceLastPosition(APIView):
                 ).order_by('-timestamp')
 
             return DeviceDataPoints.objects.none()
+
+class DeviceLastPositionToday(APIView):
+    permission_classes = [IsAuthenticated]  
+    
+    def get(self, request):
+        today = timezone.now().date()
+        today_start = timezone.make_aware(datetime.combine(today, datetime.min.time()))
+        today_end = timezone.make_aware(datetime.combine(today, datetime.max.time()))
+
+        # Pega todos os devices que têm datapoints hoje
+        devices_with_data = Device.objects.filter(
+            devicedatapoints__timestamp__range=(today_start, today_end)
+        ).distinct()
+
+        all_positions = []
+        for device in devices_with_data:
+            last_position = DeviceDataPoints.objects.filter(
+                device=device,
+                timestamp__range=(today_start, today_end)
+            ).order_by('-timestamp').first()
+
+            if last_position:
+                all_positions.append({
+                    'device_id': device.id,
+                    'device_name': device.name,
+                    'linked_employee': str(device.linked_employee),
+                    'x': last_position.x,
+                    'y': last_position.y,
+                    'timestamp': last_position.timestamp
+                })
+
+        return Response(all_positions)
 
 
 #############
