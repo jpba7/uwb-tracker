@@ -137,8 +137,8 @@ const createColumns = (handleHeatmap, handleEdit, handleDelete, handleDisable) =
 export default function DeviceTable({rows, handleAdd, handleEdit, handleDelete, handleDisable}) {
   const navigate = useNavigate();
 
-  const handleHeatmap = (device) => {
-    navigate(`/devices/${device.id}/heatmap`);
+  const handleHeatmap = (id) => {
+    navigate(`/devices/${id}/heatmap`);
   };
 
   const columns = React.useMemo(() => createColumns(handleHeatmap, handleEdit, handleDelete, handleDisable), []);
