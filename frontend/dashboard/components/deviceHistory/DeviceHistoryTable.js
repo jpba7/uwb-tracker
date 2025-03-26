@@ -28,14 +28,14 @@ const createColumns = (handleEdit, handleDelete) => [
     disableColumnMenu: true,
   },
   {
-    field: 'start_date',
+    field: 'formatted_start_date',
     headerName: 'Data Inicial',
     flex: 1,
     minWidth: 120,
     disableColumnMenu: true
   },
   {
-    field: 'end_date',
+    field: 'formatted_end_date',
     headerName: 'Data Final',
     flex: 1,
     minWidth: 120,

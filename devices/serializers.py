@@ -44,12 +44,38 @@ class DeviceTypeSerializer(serializers.ModelSerializer):
 class DeviceUserHistorySerializer(serializers.ModelSerializer):
     device_name = serializers.SerializerMethodField()
     employee_name = serializers.SerializerMethodField('get_employee_full_name')
-    start_date = serializers.SerializerMethodField('get_formatted_start_date')
-    end_date = serializers.SerializerMethodField('get_formatted_end_date')
+    formatted_start_date = serializers.SerializerMethodField('get_formatted_start_date')
+    formatted_end_date = serializers.SerializerMethodField('get_formatted_end_date')
 
     class Meta:
         model = DeviceUserHistory
-        fields = ['id', 'device', 'device_name', 'employee', 'employee_name', 'start_date', 'end_date', 'is_active']
+        fields = [
+            'id',
+            'device',
+            'device_name',
+            'employee',
+            'employee_name',
+            'start_date',  # campo original do modelo
+            'end_date',    # campo original do modelo
+            'formatted_start_date',  # campo formatado apenas para exibição
+            'formatted_end_date',    # campo formatado apenas para exibição
+            'is_active'
+        ]
+        read_only_fields = ['formatted_start_date', 'formatted_end_date']
+
+    def validate(self, attrs):
+        if not attrs.get('start_date'):
+            raise serializers.ValidationError({
+                'start_date': 'A data inicial é obrigatória.'
+            })
+        return attrs
+
+    def create(self, validated_data):
+        if not validated_data.get('start_date'):
+            raise serializers.ValidationError({
+                'start_date': 'A data inicial é obrigatória.'
+            })
+        return super().create(validated_data)
 
     def get_device_name(self, obj):
         return obj.device.name if obj.device else None

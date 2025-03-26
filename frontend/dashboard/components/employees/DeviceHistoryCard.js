@@ -110,8 +110,8 @@ const DeviceHistoryCard = ({ employeeId, onDateRangeSelect }) => {
               {histories.map((history) => (
                 <TableRow key={history.id} hover>
                   <TableCell>{history.device_name}</TableCell>
-                  <TableCell>{history.start_date}</TableCell>
-                  <TableCell>{history.end_date}</TableCell>
+                  <TableCell>{history.formatted_start_date}</TableCell>
+                  <TableCell>{history.formatted_end_date}</TableCell>
                   <TableCell>
                     <Chip
                       label={history.is_active ? 'Ativo' : 'Inativo'}

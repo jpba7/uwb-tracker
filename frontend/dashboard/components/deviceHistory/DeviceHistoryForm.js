@@ -82,14 +82,18 @@ export default function DeviceHistoryForm({ open, handleClose, device: deviceHis
   const [devices, setDevices] = useState([]);
 
   useEffect(() => {
-    const loadEmployeeData = async (employeeId) => {
+    const loadEmployeeData = async () => {
       try {
         const employeeData = await employeeService.getAll();
-        const employee = employeeData.find(emp => emp.id === employeeId);
         setEmployees(employeeData);
-        return employee;
+        
+        if (deviceHistory?.employee) {
+          const employee = employeeData.find(emp => emp.id === deviceHistory.employee);
+          return employee;
+        }
+        return null;
       } catch (error) {
-        console.error('Erro ao carregar funcionário vinculado:', error);
+        console.error('Erro ao carregar funcionários:', error);
         return null;
       }
     };
@@ -106,9 +110,9 @@ export default function DeviceHistoryForm({ open, handleClose, device: deviceHis
     };
 
     const setDeviceData = async () => {
+      const employeeData = await loadEmployeeData();
+      
       if (deviceHistory) {
-        const employeeData = deviceHistory.employee ? 
-          await loadEmployeeData(deviceHistory.employee) : null;
         const deviceData = deviceHistory.device ? 
           await loadDeviceData(deviceHistory.device) : null;
 
@@ -165,21 +169,25 @@ export default function DeviceHistoryForm({ open, handleClose, device: deviceHis
   const validateForm = () => {
     const newErrors = {};
     if (!deviceHistory && !formData.device) {
-      newErrors.device = 'Dispositivo é obrigatório';
+        newErrors.device = 'Dispositivo é obrigatório';
     }
     if (!formData.employee) {
-      newErrors.employee = 'Funcionário é obrigatório';
+        newErrors.employee = 'Funcionário é obrigatório';
     }
-    if (!formData.start_date) {
-      newErrors.start_date = 'Data Inicial é obrigatória';
+    // Validação mais explícita para start_date
+    if (!formData.start_date || !dayjs(formData.start_date).isValid()) {
+        newErrors.start_date = 'Data Inicial é obrigatória e deve ser válida';
     }
     if (formData.is_active == null || formData.is_active === '' || formData.is_active === undefined) {
-      newErrors.is_active = 'Status é obrigatório';
+        newErrors.is_active = 'Status é obrigatório';
     }
 
+    // Log para debug
+    console.log('Validation errors:', newErrors);
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+};
 
   const handleSubmit = async (event) => {
     event.preventDefault();
