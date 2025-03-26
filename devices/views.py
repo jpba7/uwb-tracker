@@ -167,10 +167,10 @@ class DeviceDataPointHeatMapSeaborn(APIView):
                 x='x',
                 y='y',
                 fill=True,
-                thresh=0.001,
+                thresh=0.008,
                 levels=50,  # Níveis crescentes de 0 a 1
-                bw_adjust=0.5,
-                gridsize=100,
+                bw_adjust=0.18,
+                gridsize=200,
                 cmap='Spectral_r',
                 alpha=0.6,
                 ax=ax
@@ -182,7 +182,7 @@ class DeviceDataPointHeatMapSeaborn(APIView):
                 x='x',
                 y='y',
                 fill=True,
-                bw_adjust=0.5,
+                bw_adjust=0.15,
                 cmap='Spectral_r',
                 alpha=0.6,
                 ax=ax
@@ -329,6 +329,7 @@ class DeviceLastPositionToday(APIView):
                 device=device,
                 timestamp__gte=thirty_mins_ago
             ).order_by('-timestamp').first()
+            last_position.timestamp = last_position.timestamp.astimezone(timezone.get_current_timezone())
 
             if last_position:
                 all_positions.append({
