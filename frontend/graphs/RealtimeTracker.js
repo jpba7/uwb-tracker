@@ -149,7 +149,8 @@ const RealtimeTracker = React.memo(() => {
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
-    const date = new Date(timestamp);
+    // Ajusta o fuso horário subtraindo 3 horas em milissegundos
+    const date = new Date(new Date(timestamp).getTime() - (3 * 60 * 60 * 1000));
     const hoje = new Date();
     const horas = date.getHours().toString().padStart(2, '0');
     const minutos = date.getMinutes().toString().padStart(2, '0');
@@ -188,6 +189,15 @@ const RealtimeTracker = React.memo(() => {
           fontSize: '1.2em'
         }}>
           {error}
+        </div>
+      ) : !data || data.length === 0 ? (
+        <div style={{ 
+          padding: '20px', 
+          textAlign: 'center',
+          color: '#666',
+          fontSize: '1.2em'
+        }}>
+          Nenhum dado de rastreamento disponível.
         </div>
       ) : (
         <>
