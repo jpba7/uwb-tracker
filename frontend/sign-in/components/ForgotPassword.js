@@ -27,34 +27,15 @@ function ForgotPassword({ open, handleClose }) {
         },
       }}
     >
-      <DialogTitle>Resetar senha</DialogTitle>
+      <DialogTitle>Redefinição senha</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >
         <DialogContentText>
-          Insira o endereço de email vinculado a sua conta e enviaremos um link para redefinição da senha.
+          Entre em contato com o administrador do sistema para iniciar o processo de redefinição de senha.
         </DialogContentText>
         
-        <input type="hidden" name="csrfmiddlewaretoken" value={csrftoken} />
-
-        <OutlinedInput
-          autoFocus
-          required
-          margin="dense"
-          id="email"
-          name="email"
-          label="Endereço de Email"
-          placeholder="Endereço de Email"
-          type="email"
-          fullWidth
-        />
       </DialogContent>
-      <DialogActions sx={{ pb: 3, px: 3 }}>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" type="submit">
-          Continue
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }
