@@ -77,10 +77,10 @@ export default function SideMenu() {
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            {loading ? 'Loading...' : (user ? `${user.first_name} ${user.last_name}` : 'User')}
+            {loading ? 'Carregando...' : (user ? `${user.first_name} ${user.last_name}` : 'User')}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {loading ? 'Loading...' : (user?.username || '')}
+            {loading ? 'Carregando...' : (user?.username || '')}
           </Typography>
         </Box>
         <IconButton

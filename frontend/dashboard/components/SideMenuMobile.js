@@ -11,8 +11,12 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import MenuButton from './MenuButton';
 import MenuContent from './MenuContent';
 import CardAlert from './CardAlert';
+import { useUser } from '../../contexts/UserContext';
+
 
 function SideMenuMobile({ open, toggleDrawer }) {
+    const { user, loading } = useUser();
+  
   return (
     <Drawer
       anchor="right"
@@ -39,12 +43,12 @@ function SideMenuMobile({ open, toggleDrawer }) {
           >
             <Avatar
               sizes="small"
-              alt="Riley Carter"
-              src="/static/images/avatar/7.jpg"
+              alt={user?.first_name || 'User'}
+              src={user?.avatar || "/static/images/avatar/default.jpg"}
               sx={{ width: 24, height: 24 }}
             />
-            <Typography component="p" variant="h6">
-              Riley Carter
+            <Typography component="p" variant="h6" sx={{ fontSize: '0.9rem' }}>
+              {loading ? 'Carregando...' : (user ? `${user.first_name} ${user.last_name}` : 'User')}
             </Typography>
           </Stack>
           <MenuButton onClick={toggleDrawer(false)}>
@@ -56,7 +60,6 @@ function SideMenuMobile({ open, toggleDrawer }) {
           <MenuContent />
           <Divider />
         </Stack>
-        <CardAlert />
         <Stack sx={{ p: 2 }}>
           <Button variant="outlined" fullWidth startIcon={<LogoutRoundedIcon />}>
             Logout
