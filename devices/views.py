@@ -51,8 +51,10 @@ class DeviceDataPointList(ListAPIView):
             else:
                 datapoints = datapoints.filter(timestamp__lte=end_date)
         if not datapoints:
+            today = timezone.now()
+            tomorrow = today + timedelta(days=1)
             datapoints = DeviceDataPoints.objects.filter(
-                timestamp__gte=datetime(2025, 3, 8, 15, 15), timestamp__lte=datetime(2025, 3, 8, 15, 20))  # TODO MUDAR PARA HOJE
+                timestamp__gte=today, timestamp__lte=tomorrow)
 
         return datapoints.order_by('timestamp')
 
